@@ -13,10 +13,10 @@ if __name__ == "__main__":
     processor = Processor(language_model, entity_recognizer, fact_checker)
 
     # Read questions from an input file
-    input_file = "input.txt"
+    input_file = "examples/example_input.txt"
     with open(input_file, 'r') as file:
         lines = file.readlines()
         for idx, line in enumerate(lines):
-            question_id, question = line.strip().split('<TAB>')
+            question_id, question = line.strip().split('\t')
             output = processor.process_question(question, question_id)
             print(output)
