@@ -1,0 +1,10 @@
+question-001    R"Yes, Managua is the capital city of Nicaragua. It is located in the southwestern part of the country and is home to many important government buildings and institutions, including the President's office and the National Assembly. The city has a population of over one million people and is known for its vibrant cultural scene, historic landmarks, and beautiful natural surroundings."
+question-001    A"yes"
+question-001    C"correct"
+question-001    E"Managua"   https://en.wikipedia.org/wiki/Managua
+question-001    E"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
+question-002    R"The capital of Nicaragua is Managua."
+question-002    A"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
+question-002    C"incorrect"
+question-002    E"Managua"   https://en.wikipedia.org/wiki/Managua
+question-002    E"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
