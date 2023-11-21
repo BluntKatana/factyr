@@ -1,6 +1,7 @@
 import spacy
 import nltk
 import WikipediaAPI
+import time
 
 
 class NamedEntityRecognizer:
@@ -71,13 +72,16 @@ class NamedEntityRecognizer:
         :param keep_types: the types of entities to keep
         """
         doc = self._nlp(text)
+        self._entities = []
 
-        self._entities = [{
-            'name': ent.text,
-            'type': ent.label_,
-            'context': self.get_context_words(text, ent.text)}
-            for ent in doc.ents
-            if ent.label_ in keep_types]
+        for sent in doc.sents:
+            sent_nlp = self._nlp(sent.text)
+            self._entities.extend([{
+                'name': ent.text,
+                'type': ent.label_,
+                'context': self.get_context_words(sent_nlp.text, ent.text)}
+                for ent in sent_nlp.ents
+                if ent.label_ in keep_types])
 
         return self._entities
 
@@ -103,9 +107,10 @@ class NamedEntityRecognizer:
 
     def disambiguate_entities(self,
                               deboost_other_entity=0.1,
-                              boost_first_hit=0.05,
-                              boost_full_hit=0.1,
-                              boost_same_category=0.2):
+                              boost_first_hit=0.07,
+                              boost_full_hit=0.07,
+                              boost_same_category=0.2,
+                              boost_title_similarity=2):
         """
         Tries to disambiguate entities and find the best Wikipedia article for each entity.
         Uses features:
@@ -117,24 +122,32 @@ class NamedEntityRecognizer:
         6. Punish if the found candidate is also an entity in the text
         """
 
-        wikipedia_api = WikipediaAPI.WikipediaAPI()
+        wikipedia_api = WikipediaAPI.WikipediaAPI('wikipedia.json.gz')
         entity_names = [entity["name"] for entity in self._entities]
 
         for entity in self._entities:
 
-            candidates = wikipedia_api.get_candidates_from_title(entity["name"])
+            candidates = wikipedia_api.get_candidates_from_title(entity["name"], limit=15)
             entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
 
             for i, candidate in enumerate(candidates):
 
-                text, url = wikipedia_api.get_text_url_from_pageid(candidate["pageid"])
+                if 'disambiguation' in candidate['title'].lower() or 'list of' in candidate['title'].lower():
+                    continue
+
+                text, url = wikipedia_api.get_text_url_from_pageid(candidate["pageid"], candidate["title"][0].upper())
                 text_processed = self.process_text(text, entity["name"])
                 title_text_processed = self.process_text(candidate["title"], entity["name"])
 
+                if 'may refer to' in text:
+                    print("MAY REFER TO", candidate["title"])
+                    continue
+
                 # Similarity between context words in text and context words in Wikipedia article title and article
                 similarity = self.jaccard_similarity(entity["context"], text_processed)
-                title_similarity = self.jaccard_similarity(entity["context"], title_text_processed)
+                title_similarity = self.jaccard_similarity(entity["context"], title_text_processed) * boost_title_similarity
                 similarity += title_similarity
+                print(candidate["title"], similarity)
 
                 # Punish if the found candidate is also an entity in the text
                 if candidate["title"] in entity_names and candidate["title"] != entity["name"]:
@@ -149,11 +162,13 @@ class NamedEntityRecognizer:
                     similarity += boost_full_hit
 
                 # Boost if entity is same category as first entity hit in Wikipedia article
-                text_nlp = self._nlp(text)
-                if text_nlp.ents:
-                    if text_nlp.ents[0].label_ == entity['type']:
-                        similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
+                if entity['type'] != 'PERSON':
+                    text_nlp = self._nlp(text)
+                    if text_nlp.ents:
+                        if text_nlp.ents[0].label_ == entity['type']:
+                            similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
 
+                print(candidate["title"], similarity)
                 # Update entity with best candidate
                 if similarity > entity['wikipedia_hit']['score']:
                     entity['wikipedia_hit'] = {
@@ -165,7 +180,9 @@ class NamedEntityRecognizer:
         return self._entities
 
 nlp = spacy.load("en_core_web_sm")
+start_time = time.time()
 entity_recognizer = NamedEntityRecognizer(nlp)
-entity_recognizer.extract_entities("Yes, Managua is the capital city of Nicaragua. It is located in the southwestern part of the country and is home to many important government buildings and institutions, including the President's office and the National Assembly. The city has a population of over one million people and is known for its vibrant cultural scene, historic landmarks, and beautiful natural surroundings.")
+entity_recognizer.extract_entities("Donald Trump and Biden are both from the United States. Ronaldo is from Portugal.")
 entity_recognizer.disambiguate_entities()
 entity_recognizer.print_entities()
+print("--- %s seconds ---" % (time.time() - start_time))
