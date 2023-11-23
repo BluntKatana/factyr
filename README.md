@@ -18,7 +18,7 @@ Team (19): Floris Bos, Pooja Mangal, Kshitij Kavimandan and Maik Larooij
      - [ ] 3. Wrapping up: write function/class to feed a question (input) and get the answer text as output
 
 - [ ] Named Entity Recognition and Disambiguation (linking)
-     - [ ] 1. Choose NER model (like SpaCy, NLTK, BERT)
+     - [x] 1. Choose NER model (like SpaCy, NLTK, BERT) -> **SpaCy**
      - [ ] 2. Write function/class to feed raw text (LLM output) and get as output the extracted entities with their types
      - [ ] 3. Find a way/write a function to generate Wikipedia candidates for a single entity
      - [ ] 4. Find a way/write a function to, based on an entity (+ context?), rank the candidates and pick the highest scoring one
@@ -31,5 +31,6 @@ Team (19): Floris Bos, Pooja Mangal, Kshitij Kavimandan and Maik Larooij
 
 - [ ] Fact checking
      - [ ] 1. Choose a knowledge base to use (like Wikidata) 
-     - [ ] 2. Based on the query and extracted answer, find a way to check if the answer of the LLM is true or false, with the help of the knowledge base
-     - [ ] 3. Wrapping up: write a class/function to feed the LLM query, extracted answer (from last step) and knowledge base and get as output true or false, indicating the correctness of the LLM's answer
+     - [ ] 2. Extract relations from the answer to be able to ask a query to the knowledge base
+     - [ ] 3. Based on the query and extracted answer, find a way to check if the answer of the LLM is true or false, with the help of the knowledge base
+     - [ ] 4. Wrapping up: write a class/function to feed the LLM query, extracted answer (from last step) and knowledge base and get as output true or false, indicating the correctness of the LLM's answer
