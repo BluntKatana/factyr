@@ -3,6 +3,7 @@ import ujson
 import gzip
 import time
 
+
 class WikipediaAPI:
 
     def __init__(self, wikipedia_file: str):
@@ -71,7 +72,7 @@ class WikipediaAPI:
         # text = data[list(data.keys())[0]]["extract"]
         # url = data[list(data.keys())[0]]["fullurl"]
 
-        print(f"Loading Wikipedia file for {first_char}...")
+        # print(f"Loading Wikipedia file for {first_char}...")
 
         try:
             text_dict = self._cache[first_char]

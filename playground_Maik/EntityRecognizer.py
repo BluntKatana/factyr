@@ -1,7 +1,6 @@
 import spacy
 import nltk
 import WikipediaAPI
-import time
 
 
 class NamedEntityRecognizer:
@@ -14,17 +13,15 @@ class NamedEntityRecognizer:
 
     def __init__(self, spacy_model):
 
-        self._nlp = spacy_model
+        self._nlp = spacy.load(spacy_model)
         self._entities = []
 
     def print_entities(self):
 
         for entity in self._entities:
             print(f"Entity: {entity['name']}")
-            print(f"Type: {entity['type']}")
             if 'wikipedia_hit' in entity:
-                print(f"Wikipedia hit: {entity['wikipedia_hit']['url']}")
-            print("\n")
+                print(f"Entity Wikipedia hit: {entity['wikipedia_hit']['url']}")
 
     def process_text(self, text: str, current_entity: str = "") -> list:
         """
@@ -140,14 +137,13 @@ class NamedEntityRecognizer:
                 title_text_processed = self.process_text(candidate["title"], entity["name"])
 
                 if 'may refer to' in text:
-                    print("MAY REFER TO", candidate["title"])
                     continue
 
                 # Similarity between context words in text and context words in Wikipedia article title and article
                 similarity = self.jaccard_similarity(entity["context"], text_processed)
                 title_similarity = self.jaccard_similarity(entity["context"], title_text_processed) * boost_title_similarity
                 similarity += title_similarity
-                print(candidate["title"], similarity)
+                # print(candidate["title"], similarity)
 
                 # Punish if the found candidate is also an entity in the text
                 if candidate["title"] in entity_names and candidate["title"] != entity["name"]:
@@ -168,7 +164,7 @@ class NamedEntityRecognizer:
                         if text_nlp.ents[0].label_ == entity['type']:
                             similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
 
-                print(candidate["title"], similarity)
+                # print(candidate["title"], similarity)
                 # Update entity with best candidate
                 if similarity > entity['wikipedia_hit']['score']:
                     entity['wikipedia_hit'] = {
@@ -179,10 +175,10 @@ class NamedEntityRecognizer:
 
         return self._entities
 
-nlp = spacy.load("en_core_web_sm")
-start_time = time.time()
-entity_recognizer = NamedEntityRecognizer(nlp)
-entity_recognizer.extract_entities("Donald Trump and Biden are both from the United States. Ronaldo is from Portugal.")
-entity_recognizer.disambiguate_entities()
-entity_recognizer.print_entities()
-print("--- %s seconds ---" % (time.time() - start_time))
+# nlp = spacy.load("en_core_web_sm")
+# start_time = time.time()
+# entity_recognizer = NamedEntityRecognizer(nlp)
+# entity_recognizer.extract_entities("Donald Trump and Biden are both from the United States. Ronaldo is from Portugal.")
+# entity_recognizer.disambiguate_entities()
+# entity_recognizer.print_entities()
+# print("--- %s seconds ---" % (time.time() - start_time))
