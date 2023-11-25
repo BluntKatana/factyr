@@ -60,6 +60,7 @@ class StanfordOpenIE:
         )
         if simple_format:
             triples = []
+
             for sentence in core_nlp_output['sentences']:
                 for triple in sentence['openie']:
                     triples.append({
@@ -67,6 +68,7 @@ class StanfordOpenIE:
                         'relation': triple['relation'],
                         'object': triple['object']
                     })
+
             return triples
         else:
             return core_nlp_output
@@ -91,6 +93,7 @@ class StanfordOpenIE:
             graph.append('"{}" -> "{}" [ label="{}" ];'.format(er['subject'], er['object'], er['relation']))
         graph.append('}')
 
+        # print("======================?graph", graph)
         output_dir = os.path.join('.', os.path.dirname(png_filename))
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
