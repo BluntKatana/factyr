@@ -3,7 +3,7 @@ YES_NO_QUESTION = 1
 ENTITY_QUESTION = 2
 
 
-class FactChecker:
+class AnswerExtractor:
 
     def get_question_type(self, question, answer):
         """

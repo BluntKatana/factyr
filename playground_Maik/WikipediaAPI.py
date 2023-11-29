@@ -47,10 +47,12 @@ class WikipediaAPI:
         r = self._session.get(url=self._url, params=params)
         data = r.json()
 
+        ujson.dump(data, open("test.json", "w"))
+
         return data["query"]["search"]
 
 
-    def get_text_url_from_pageid(self, page_id, first_char):
+    def get_text_url_from_pageid(self, title, page_id, first_char):
         """
         Use pageid to get text and url from Wikipedia article.
 
@@ -79,14 +81,14 @@ class WikipediaAPI:
         except KeyError:
 
             try:
-                with open(f"wikidata/{first_char}.json", "r") as f:
+                with open(f"NameWikiJSON/{first_char}.json", "r") as f:
                     text_dict = ujson.load(f)
                     self._cache[first_char] = text_dict
             except FileNotFoundError:
                 text_dict = {}
 
         try:
-            text = text_dict[str(page_id)]
+            text = text_dict[title]
         except KeyError:
             text = ""
         url = f"https://en.wikipedia.org/wiki?curid={page_id}"

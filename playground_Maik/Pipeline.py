@@ -1,9 +1,9 @@
 class Pipeline:
 
-    def __init__(self, language_model, entity_recognizer, fact_checker):
+    def __init__(self, language_model, entity_recognizer, answer_extractor):
         self.language_model = language_model
         self.entity_recognizer = entity_recognizer
-        self.fact_checker = fact_checker
+        self.answer_extractor = answer_extractor
 
     def process_question(self, question, question_id):
         """
@@ -21,9 +21,8 @@ class Pipeline:
         # Entity recognition and linking
         self.entity_recognizer.extract_entities(answer)
         entities = self.entity_recognizer.disambiguate_entities()
-
         self.entity_recognizer.print_entities()
 
-        # Fact checking
-        print(f"Question type: {self.fact_checker.get_question_type(question, answer)}")
+        # Answer extraction
+        print(f"Question type: {self.answer_extractor.get_question_type(question, answer)}")
         # TODO!
