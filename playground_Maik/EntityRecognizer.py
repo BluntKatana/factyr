@@ -132,7 +132,7 @@ class NamedEntityRecognizer:
                 if 'disambiguation' in candidate['title'].lower() or 'list of' in candidate['title'].lower():
                     continue
 
-                text, url = wikipedia_api.get_text_url_from_pageid(candidate["pageid"], candidate["title"][0].upper())
+                text, url = wikipedia_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
                 text_processed = self.process_text(text, entity["name"])
                 title_text_processed = self.process_text(candidate["title"], entity["name"])
 
