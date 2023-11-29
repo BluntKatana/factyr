@@ -47,6 +47,8 @@ class WikipediaAPI:
         r = self._session.get(url=self._url, params=params)
         data = r.json()
 
+        ujson.dump(data, open("test.json", "w"))
+
         return data["query"]["search"]
 
 
