@@ -8,15 +8,14 @@ from FactChecker import FactChecker
 from FIleProcessor import FileProcessor
 
 if __name__ == "__main__":
-
-    input = sys.argv[1]
-    output = sys.argv[2]
+    input = "examples\example_input.txt"
+    output = "examples\example_out.txt"
 
     file_processor = FileProcessor(input, output)
     questions = file_processor.parse_input()
 
     language_model = LanguageModel()
-    entity_recognizer = NamedEntityRecognizer('en_core_web_sm')
+    entity_recognizer = NamedEntityRecognizer("en_core_web_sm")
     fact_checker = FactChecker()
     pipeline = Pipeline(language_model, entity_recognizer, fact_checker)
 

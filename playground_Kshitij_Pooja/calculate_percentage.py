@@ -721,11 +721,5 @@ def calculate_percentage(question, rel1, rel2):
 
         x = len(matching_relations)
         y = len(combined_relations)
-    print(f"Percentage: {(x / y) * 100}\n-----------------")
-
-
-print("-----------------")
-calculate_percentage(is_rome_capital_of_italy, wiki_of_rome, wiki_of_italy)
-calculate_percentage(is_rome_capital_of_italy, wiki_of_rome, wiki_of_netherlands)
-calculate_percentage(is_ams_capital_of_nether, wiki_of_amsterdam, wiki_of_netherlands)
-calculate_percentage(is_rome_capital_of_nether, wiki_of_rome, wiki_of_netherlands)
+    print(f"Percentage: {(x / y) * 100}")
+    return (x / y) * 100
