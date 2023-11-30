@@ -32,3 +32,4 @@ if __name__ == "__main__":
         print(question["question_id"], question["question"])
         answer, extracted_answer, entities, fact_check = pipeline.process_question(question["question"], question["question_id"])
         file_processor.write_output(question["question_id"], question["question"], answer, extracted_answer, entities, fact_check)
+        print("---------")
