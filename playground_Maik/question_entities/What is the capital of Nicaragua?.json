@@ -1,0 +1,141 @@
+[
+    {
+        "name": "Managua",
+        "type": "GPE",
+        "context": [
+            {
+                "word": "capit",
+                "weight": 0.23076923076923075
+            },
+            {
+                "word": "citi",
+                "weight": 0.30769230769230765
+            },
+            {
+                "word": "nicaragua",
+                "weight": 0.4615384615384615
+            }
+        ],
+        "wikipedia_hit": {
+            "title": "Managua",
+            "url": "https:\/\/en.wikipedia.org\/wiki\/Managua",
+            "score": 1.4828571428571427
+        }
+    },
+    {
+        "name": "Nicaragua",
+        "type": "GPE",
+        "context": [
+            {
+                "word": "managua",
+                "weight": 0.5454545454545455
+            },
+            {
+                "word": "capit",
+                "weight": 0.27272727272727276
+            },
+            {
+                "word": "citi",
+                "weight": 0.18181818181818182
+            }
+        ],
+        "wikipedia_hit": {
+            "title": "Nicaragua",
+            "url": "https:\/\/en.wikipedia.org\/wiki\/Nicaragua",
+            "score": 1.4114285714285715
+        }
+    },
+    {
+        "name": "Managua",
+        "type": "GPE",
+        "context": [
+            {
+                "word": "found",
+                "weight": 0.04761904761904762
+            },
+            {
+                "word": "1893",
+                "weight": 0.09523809523809525
+            },
+            {
+                "word": "becam",
+                "weight": 0.14285714285714285
+            },
+            {
+                "word": "capit",
+                "weight": 0.1904761904761905
+            },
+            {
+                "word": "nicaragua",
+                "weight": 0.2380952380952381
+            },
+            {
+                "word": "1938",
+                "weight": 0.2857142857142857
+            }
+        ],
+        "wikipedia_hit": {
+            "title": "Managua",
+            "url": "https:\/\/en.wikipedia.org\/wiki\/Managua",
+            "score": 0.8485714285714288
+        }
+    },
+    {
+        "name": "Nicaragua",
+        "type": "GPE",
+        "context": [
+            {
+                "word": "managua",
+                "weight": 0.3125
+            },
+            {
+                "word": "found",
+                "weight": 0.25
+            },
+            {
+                "word": "1893",
+                "weight": 0.18749999999999997
+            },
+            {
+                "word": "becam",
+                "weight": 0.125
+            },
+            {
+                "word": "capit",
+                "weight": 0.0625
+            },
+            {
+                "word": "1938",
+                "weight": 0.0625
+            }
+        ],
+        "wikipedia_hit": {
+            "title": "Nicaragua",
+            "url": "https:\/\/en.wikipedia.org\/wiki\/Nicaragua",
+            "score": 0.7584782608695653
+        }
+    },
+    {
+        "name": "Managua",
+        "type": "GPE",
+        "context": [
+            {
+                "word": "notabl",
+                "weight": 0.5
+            },
+            {
+                "word": "landmark",
+                "weight": 0.3333333333333333
+            },
+            {
+                "word": "includ",
+                "weight": 0.16666666666666666
+            }
+        ],
+        "wikipedia_hit": {
+            "title": "Managua",
+            "url": "https:\/\/en.wikipedia.org\/wiki\/Managua",
+            "score": 0.34
+        }
+    }
+]

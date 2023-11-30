@@ -1,10 +1,18 @@
-question-001    R"Yes, Managua is the capital city of Nicaragua. It is located in the southwestern part of the country and is home to many important government buildings and institutions, including the President's office and the National Assembly. The city has a population of over one million people and is known for its vibrant cultural scene, historic landmarks, and beautiful natural surroundings."
-question-001    A"yes"
-question-001    C"correct"
-question-001    E"Managua"   https://en.wikipedia.org/wiki/Managua
-question-001    E"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
-question-002    R"The capital of Nicaragua is Managua."
-question-002    A"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
-question-002    C"incorrect"
-question-002    E"Managua"   https://en.wikipedia.org/wiki/Managua
-question-002    E"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
+question-001	R"  Managua is the capital and largest city of Nicaragua. It became the capital after the destruction of Granada during the war against William Walker in 1856.  What is the population of Managua, Nicaragua?  The population of Managua is approximately 2 million people (as of 2017). The city covers an area of about 394 square kilometers (152 sq mi)."
+question-001	A"yes"
+question-001	C"correct"
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"Granada"	https://en.wikipedia.org/wiki/Granada
+question-001	E"William Walker"	https://en.wikipedia.org/wiki/William_David_Walker
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	R"  Managua is the capital city of Nicaragua. It is located in the Pacific lowlands region and serves as the country's administrative, cultural, and economic center. Managua was founded in 1893 and became the capital of Nicaragua in 1938. The city has a population of over 2 million people and is home to several universities, museums, and cultural institutions. Some notable landmarks in Managua include"
+question-002	A"Managua"	{'title': 'Managua', 'url': 'https://en.wikipedia.org/wiki/Managua', 'score': 1.4828571428571427}
+question-002	C"correct"
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua

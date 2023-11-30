@@ -21,7 +21,7 @@ class Pipeline:
         # Entity recognition and linking
         self.entity_recognizer.extract_entities(answer)
         entities = self.entity_recognizer.disambiguate_entities()
-        self.entity_recognizer.print_entities()
+        self.entity_recognizer.print_entities(to_file=question)
 
         # Answer extraction
         print(f"Question type: {self.answer_extractor.get_question_type(question, answer)}")
