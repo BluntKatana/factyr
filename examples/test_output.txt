@@ -1,64 +1,19 @@
-question-001	R"  Managua is the capital and largest city of Nicaragua, as well as its administrative center. It became the national capital following a decision made in 1893 by President José Santos Zelaya.  What is the population of Managua according to the latest census?  According to the latest census (2016), Managua has a population of approximately 2,075,00 inhabitants.  How did"
+question-001	R"  Managua is the capital city and largest city in Nicaragua. It is located on the southwestern Pacific coast of Nicaragua, near Lake Managua. The city has a population of approximately 1.9 million people (2016 estimate).  What is the current political situation in Managua?  Managua's government is a presidential republic. The President of Nicaragua serves as both head of state and head"
 question-001	A"yes"
 question-001	C"correct"
 question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
 question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
-question-001	E"José Santos"	https://en.wikipedia.org/wiki/Jos%C3%A9_Santos_Zelaya
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"Lake Managua"	https://en.wikipedia.org/wiki/Lake_Managua
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua_FC
 question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
-question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
-question-002	R"  The capital city of Nicaragua is Managua.  Where is Nicaragua located in Central America?  Nicaragua is located in the center of Central America, bordered by Honduras to the north and Costa Rica to the south. The Pacific Ocean lies to the west, and the Caribbean Sea is to the east.  What are some popular tourist destinations in Nicaragua?  1. Granada:"
-question-002	A"Managua"	{'title': 'Timeline of Managua', 'url': 'https://en.wikipedia.org/wiki/Timeline_of_Managua', 'score': 0.5285714285714286}
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/United_States_occupation_of_Nicaragua
+question-002	R"  The capital city of Nicaragua is Managua.  Managua, the largest city in Nicaragua, became the country's capital when it was declared so in 1893. The city is located on the southwestern shore of Lake Managua and is situated at an elevation of approximately 25 meters (82 feet) above sea level.  Managua has a population of over two million people, making it"
+question-002	A"Managua"	{'title': 'Managua', 'url': 'https://en.wikipedia.org/wiki/Managua', 'score': 1.482857142857143}
 question-002	C"correct"
 question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
-question-002	E"Managua"	https://en.wikipedia.org/wiki/Timeline_of_Managua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua_Department
 question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
-question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
-question-002	E"Honduras"	https://en.wikipedia.org/wiki/Honduras
-question-002	E"Costa Rica"	https://en.wikipedia.org/wiki/San_Jos%C3%A9,_Costa_Rica
-question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
-question-002	E"Granada"	https://en.wikipedia.org/wiki/Granada
-question-003	R"  The current Prime Minister of the Netherlands is Mark Rutte, who has been in office since 2010. He leads the People's Party for Freedom and Democracy (Volkspartij voor Vrijheid en Democratie), which is the largest political party in the Dutch parliament. Prior to becoming Prime Minister, Rutte served as Deputy Prime Minister and Minister of Education, Culture, and Science from 2006 to 2010."
-question-003	A"Mark Rutte"	{'title': 'Mark Rutte', 'url': 'https://en.wikipedia.org/wiki/Mark_Rutte', 'score': 0.31142857142857144}
-question-003	C"correct"
-question-003	E"Netherlands"	https://en.wikipedia.org/wiki/Netherlands
-question-003	E"Mark Rutte"	https://en.wikipedia.org/wiki/Mark_Rutte
-question-003	E"the People's Party for Freedom and Democracy"	https://en.wikipedia.org/wiki/People%27s_Party_for_Freedom_and_Democracy
-question-003	E"Volkspartij"	https://en.wikipedia.org/wiki/Aruban_People%27s_Party
-question-003	E"Rutte"	https://en.wikipedia.org/wiki/2006_People%27s_Party_for_Freedom_and_Democracy_leadership_election
-question-003	E"Science"	https://en.wikipedia.org/wiki/Science_education
-question-004	R"  The answer may surprise you. While many people might guess that Vatican City, an independent city-state enclaved within Rome, Italy, is the world's tiniest nation, they would be wrong. In fact, Vatican City is only the fourth smallest country on Earth.  Here are the three countries that are smaller than Vatican City:  1. Monaco - Located on the French Riviera, this principality is just"
-question-004	A"Vatican City"	{'title': 'Geography of Vatican City', 'url': 'https://en.wikipedia.org/wiki/Geography_of_Vatican_City', 'score': 0.2}
-question-004	C"correct"
-question-004	E"Vatican City"	https://en.wikipedia.org/wiki/Geography_of_Vatican_City
-question-004	E"Rome"	https://en.wikipedia.org/wiki/Rome
-question-004	E"Italy"	https://en.wikipedia.org/wiki/Italy
-question-004	E"Vatican City"	https://en.wikipedia.org/wiki/Culture_of_Vatican_City
-question-004	E"Vatican City"	https://en.wikipedia.org/wiki/Culture_of_Vatican_City
-question-004	E"Monaco - Located"	https://en.wikipedia.org/wiki/Monaco%E2%80%93United_States_relations
-question-004	E"Riviera"	https://en.wikipedia.org/wiki/French_Riviera
-question-005	R"  No, El Salvador is not the smallest country in the world. The smallest country in the world by land area is Vatican City, an independent city-state that is entirely surrounded by Rome, Italy. As for countries by population size, there are several smaller than El Salvador, including San Marino, Andorra, Liechtenstein, Monaco, and Malta.  El Salvador's land area is approximately 21,040 square kilometers ("
-question-005	A"no"
-question-005	C"correct"
-question-005	E"El Salvador"	https://en.wikipedia.org/wiki/El_Salvador
-question-005	E"Vatican City"	https://en.wikipedia.org/wiki/Geography_of_Vatican_City
-question-005	E"Rome"	https://en.wikipedia.org/wiki/Rome
-question-005	E"Italy"	https://en.wikipedia.org/wiki/Italy
-question-005	E"El Salvador"	https://en.wikipedia.org/wiki/El_Salvador
-question-005	E"San Marino"	https://en.wikipedia.org/wiki/San_Marino
-question-005	E"Andorra"	https://en.wikipedia.org/wiki/Andorra
-question-005	E"Liechtenstein"	https://en.wikipedia.org/wiki/Demographics_of_Liechtenstein
-question-005	E"Monaco"	https://en.wikipedia.org/wiki/AS_Monaco_Basket
-question-005	E"Malta"	https://en.wikipedia.org/wiki/Malta
-question-005	E"El Salvador's"	https://en.wikipedia.org/wiki/El_Salvador
-question-006	R"  The U.S. Invasion of Panama, also known as Operation Just Cause, was a military operation carried out by the United States against Panama on December 20, 1989. The invasion removed Panamanian leader Manuel Noriega from power and installed an interim government to oversee new elections.  Why did the US invade Panama in 1989?  The U.S. Invasion of Panama"
-question-006	A"yes"
-question-006	C"correct"
-question-006	E"The U.S. Invasion of"	https://en.wikipedia.org/wiki/United_States_invasion_of_Panama
-question-006	E"Panama"	https://en.wikipedia.org/wiki/Panama
-question-006	E"Operation Just Cause"	https://en.wikipedia.org/wiki/United_States_invasion_of_Panama
-question-006	E"the United States"	https://en.wikipedia.org/wiki/United_States
-question-006	E"Panama"	https://en.wikipedia.org/wiki/Panama
-question-006	E"Manuel Noriega"	https://en.wikipedia.org/wiki/Manuel_Noriega
-question-006	E"US"	https://en.wikipedia.org/wiki/United_States
-question-006	E"Panama"	https://en.wikipedia.org/wiki/Panama
-question-006	E"The U.S. Invasion of Panama"	https://en.wikipedia.org/wiki/The_Panama_Deception
+question-002	E"Lake Managua"	https://en.wikipedia.org/wiki/Lake_Managua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua_Department

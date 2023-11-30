@@ -1,18 +1,18 @@
-question-001	R"  Managua is the capital and largest city of Nicaragua. It became the capital after the destruction of Granada during the war against William Walker in 1856.  What is the population of Managua, Nicaragua?  The population of Managua is approximately 2 million people (as of 2017). The city covers an area of about 394 square kilometers (152 sq mi)."
+question-001	R"  Managua is the capital and largest city of Nicaragua. It became the national capital in 1893, replacing León Viejo (Old León) and Granada as the administrative center of the country.  What is Managua known for besides being the capital?  Managua is also known for its vibrant cultural scene, including music, dance, theater, and art. The city is home to several museums, g"
 question-001	A"yes"
 question-001	C"correct"
 question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
 question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"León Viejo"	https://en.wikipedia.org/wiki/Old_San_Juan
 question-001	E"Granada"	https://en.wikipedia.org/wiki/Granada
-question-001	E"William Walker"	https://en.wikipedia.org/wiki/William_David_Walker
 question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
-question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
 question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
-question-002	R"  Managua is the capital city of Nicaragua. It is located in the Pacific lowlands region and serves as the country's administrative, cultural, and economic center. Managua was founded in 1893 and became the capital of Nicaragua in 1938. The city has a population of over 2 million people and is home to several universities, museums, and cultural institutions. Some notable landmarks in Managua include"
-question-002	A"Managua"	{'title': 'Managua', 'url': 'https://en.wikipedia.org/wiki/Managua', 'score': 1.4828571428571427}
+question-002	R"  Managua is the capital and largest city in Nicaragua. It is located on the southwestern Pacific coast of the country, near the southern shore of Lake Managua. The city has a population of approximately 1.9 million people (2016 estimate).  Managua was founded as a town in 1839 and became the capital of Nicaragua in 1852. It replaced León, which had been"
+question-002	A"Managua"	{'title': 'Managua', 'url': 'https://en.wikipedia.org/wiki/Managua', 'score': 1.5304761904761903}
 question-002	C"correct"
 question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
 question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-002	E"Lake Managua"	https://en.wikipedia.org/wiki/Lake_Managua
 question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
 question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
-question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	E"León"	https://en.wikipedia.org/wiki/LEON

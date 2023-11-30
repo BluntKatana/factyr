@@ -29,7 +29,7 @@ class NamedEntityRecognizer:
             if 'wikipedia_hit' in entity:
                 print(f"Entity Wikipedia hit: {entity['wikipedia_hit']['url']}")
 
-    def process_text(self, text: str, current_entity: str = "", entity_occurence_in_text: int = -1) -> list:
+    def process_text(self, text: str, current_entity: str = "", stemmed=True) -> list:
         """
         Processes a text to be able to compare it with other texts.
         Uses Porter stemming and removes stop words.
@@ -37,7 +37,7 @@ class NamedEntityRecognizer:
         :param text: the text to process
         :param current_entity: the current entity to remove from the text
             because it is not relevant for the comparison
-        :param entity_occurence_in_text: the occurence of the entity in the text (-1 means not taking into account - equal weights)
+        :return process_text
         """
 
         current_entity_tokenized = nltk.word_tokenize(current_entity)
@@ -54,11 +54,30 @@ class NamedEntityRecognizer:
                          and len(word) > 1
                          ]
 
-        # If entity occurence in text is not specified, return all stemmed context words
-        if entity_occurence_in_text == -1:
-            return [{'word': stemmer.stem(word), "weight": 1 } for word in context_words]
+        # If entity occurence in text is not specified, return all context words
+        # (stemmed or not-stemmed)
+        if stemmed:
+            return [stemmer.stem(word) for word in context_words]
+        return context_words
 
-        # If entity occurence in text is specified, we want to give more weight to 
+
+    def get_context_words(self, text: str, current_entity: str, entity_occurence_in_text: int) -> list:
+        """
+        Retrieves the context words of a certain entity within a text.
+        Uses distance to entity to assign normalized weights
+
+        :param text: the text to get the context words from
+        :param current_entity: the entity for which the context words have to be found and weighted
+        :param entity_occurence_in_text: the occurence of the entity in the text (-1 means not taking into account - equal weights)
+
+        :returns list({ word: str, weight: str }): list of context words with assigned weights
+        """
+
+        text_tokenized = nltk.word_tokenize(text)
+        stemmer = nltk.PorterStemmer()
+        context_words = self.process_text(text, current_entity, stemmed=False)
+
+         # If entity occurence in text is specified, we want to give more weight to 
         # the context words that are closer to the entity
         entity_occurence = 1
         # TODO: Perhaps use different method to get index of entity in text (supporting entity with multiple words)
@@ -74,7 +93,6 @@ class NamedEntityRecognizer:
             if word != current_entity:
                 word_distance_to_entity[word] = abs(idx - index_of_entity_in_text)
 
-
         # Noramlize the disatnce of each word based on the highest distance
         # (longer texts have higher distances than shorter texts)
         highest_distance = max(word_distance_to_entity.values())
@@ -85,13 +103,10 @@ class NamedEntityRecognizer:
         # Get the sum of all CONTEXT WORD distances and normalize the distances to add up to 1
         sum_of_context_word_distances = sum([distance for word, distance in norm_word_distance_to_entity.items() if word in context_words])
 
-        # Return the context words with their normalized weights
+        # Return the stemmed context words with their normalized weights
+        stemmer = nltk.PorterStemmer()
         return [{'word': stemmer.stem(word), "weight": distance / sum_of_context_word_distances } 
                     for word, distance in norm_word_distance_to_entity.items() if word in context_words]
-
-
-    def get_context_words(self, text: str, entity_name: str, entity_occurence_in_text: int) -> list:
-        return self.process_text(text, entity_name, entity_occurence_in_text)
 
     def extract_entities(self, text: str, keep_types: list = ['GPE', 'PERSON', 'ORG']) -> list:
         """
@@ -156,6 +171,7 @@ class NamedEntityRecognizer:
         for entity in self._entities:
 
             candidates = wikipedia_api.get_candidates_from_title(entity["name"], limit=15)
+            context_words = [weighted_word["word"] for weighted_word in entity["context"]]
             entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
 
             for i, candidate in enumerate(candidates):
@@ -174,8 +190,8 @@ class NamedEntityRecognizer:
                 similarity = 0
 
                 # Similarity between context words in text and context words in Wikipedia article title and article
-                similarity += self.jaccard_similarity(entity["context"], wikipedia_text_processed)
-                similarity += self.jaccard_similarity(entity["context"], wikipedia_title_text_processed) * boost_title_similarity
+                similarity += self.jaccard_similarity(context_words, wikipedia_text_processed)
+                similarity += self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
 
                 # Boost if there is a full hit (entity name === canadidate title)
                 if self.is_full_hit(entity["name"], candidate["title"]):
@@ -189,11 +205,10 @@ class NamedEntityRecognizer:
                 if i == 0:
                     similarity += boost_first_hit
 
-
                 # Add similarity of context words in text and context words in Wikipedia article introtext
                 # based on the weight of context weights
                 for context_word in entity["context"]:
-                    if self.is_word_in_processed_text(context_word["word"], wikipedia_text_processed):
+                    if context_word["word"] in wikipedia_text_processed:
                         similarity += context_word["weight"]
 
                 # Boost if entity is same category as first entity hit in Wikipedia article
@@ -220,20 +235,22 @@ class NamedEntityRecognizer:
     def jaccard_similarity(self, list_1: list, list_2: list) -> float:
         """
         Calculates the Jaccard similarity between two lists of strings.
+
         :param a: the first list
         :param b: the second list
         """
         # Return 0 if one of the lists is empty
         if len(list_1) == 0 or len(list_2) == 0:
             return 0
-        list_1 = set([parsed_word["word"] for parsed_word in list_1])
-        list_2 = set([parsed_word["word"] for parsed_word in list_2])
-        return len(list_1.intersection(list_2)) / len(list_1.union(list_2))
+        set_1 = set(list_1)
+        set_2 = set(list_2)
+        return len(set_1.intersection(set_2)) / len(set_1.union(set_2))
 
     def is_full_hit(self, word_1: str, word_2: str):
         """
         Determines if a word is a full hit with another word
         Full hit = word 1 is equal to word 2 (minus stop words).
+
         :param word_1: the first word to determine full hit for
         :param word_2: the second word to determine full hit for
         """
@@ -242,10 +259,3 @@ class NamedEntityRecognizer:
         word_2_norm = [word.lower() for word in word_2.split() if word.lower() not in stopwords]
         return word_1_norm == word_2_norm
 
-    def is_word_in_processed_text(self, word: str, processed_text: list):
-        """
-        Determines if there is a word in a certain processed_text,
-        meaning a text which is parsed with the NamedEntityRecognizer.process_text function
-        resulting in a list with obejcts
-        """
-        return word in [processed_word["word"] for processed_word in processed_text]
