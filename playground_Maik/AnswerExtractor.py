@@ -62,7 +62,7 @@ class AnswerExtractor:
             logits = self._yes_nomodel(sequence)[0]
             probabilities = torch.softmax(logits, dim=1).detach().cpu().tolist()[0]
 
-        return 'yes' if probabilities[0] < probabilities[1] else 'no'
+        return {'A': 'yes' if probabilities[0] < probabilities[1] else 'no', 'type': YES_NO_QUESTION}
 
     def answer_entity_question(self, question, answer, entities):
         """
@@ -77,4 +77,4 @@ class AnswerExtractor:
         question_nlp = self._nlp(question)
         question_ents = [ent.text for ent in question_nlp.ents]
 
-        return [entity for entity in entities if entity['name'] not in question_ents][0]
+        return {'A': [entity for entity in entities if entity['name'] not in question_ents][0], 'type': ENTITY_QUESTION}

@@ -7,6 +7,10 @@ class FileProcessor:
         self.in_path = in_path
         self.out_path = out_path
 
+        # Clear output file
+        with open(self.out_path, 'w') as file:
+            file.write('')
+
     def parse_input(self) -> list:
         """
         Parses input file and returns list of questions.
@@ -25,3 +29,35 @@ class FileProcessor:
                 })
 
         return questions
+
+    def write_output(self, question_id, question, raw_answer, 
+                     extracted_answer, entities, fact_check):
+        """
+        Writes output to file.
+
+        :param question_id: id of the question
+        :param question: question to be processed
+        :param raw_answer: raw answer from language model
+        :param extracted_answer: extracted answer
+        :param entities: list of entities in the answer
+        :param fact_check: fact check of the answer
+        """
+
+        with open(self.out_path, 'a') as file:
+
+            # Raw answer
+            raw_answer = raw_answer.replace('"', "'").replace('\n', ' ')
+            file.write(f'{question_id}\tR"{raw_answer}"\n')
+
+            # Extracted answer
+            if extracted_answer['type'] == 1:
+                file.write(f'{question_id}\tA"{extracted_answer["A"]}"\n')
+            else:
+                file.write(f'{question_id}\tA"{extracted_answer["A"]["name"]}"\t{extracted_answer["A"]["wikipedia_hit"]}\n')
+
+            # Fact check
+            file.write(f'{question_id}\tC"{fact_check}"\n')
+
+            # Entities
+            for entity in entities:
+                file.write(f'{question_id}\tE"{entity["name"]}"\t{entity["wikipedia_hit"]["url"]}\n')

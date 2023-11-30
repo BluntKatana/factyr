@@ -53,6 +53,10 @@ class NamedEntityRecognizer:
 
         a = set(a)
         b = set(b)
+
+        if len(a.union(b)) == 0:
+            return 0
+
         return len(a.intersection(b)) / len(a.union(b))
 
     def get_context_words(self, text: str, entity_name: str) -> list:

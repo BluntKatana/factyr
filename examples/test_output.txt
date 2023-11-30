@@ -1,0 +1,60 @@
+question-001	R"  Managua is the capital and largest city of Nicaragua. It became the national capital in 1893, replacing León Viejo, which was destroyed by a volcanic eruption.  What is the climate like in Managua, Nicaragua?  Managua has a tropical savanna climate with significant rainfall from May to October and relatively less rainfall from November to April. The average annual temperature is "
+question-001	A"yes"
+question-001	C"correct"
+question-001	E"Managua"	https://en.wikipedia.org/wiki?curid=57042
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki?curid=21362
+question-001	E"León Viejo"	https://en.wikipedia.org/wiki?curid=13709649
+question-001	E"Managua"	https://en.wikipedia.org/wiki?curid=57042
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki?curid=21362
+question-001	E"Managua"	https://en.wikipedia.org/wiki?curid=57042
+question-002	R"  The capital city of Nicaragua is Managua. It is located in the western part of the country, on the southern shore of Lake Managua. Managua has a population of over 2 million people and serves as the political, economic, and cultural center of Nicaragua. The city was founded in 1893 and became the capital of Nicaragua in 1894 after the previous capital, Leon, was destroyed by"
+question-002	A"Managua"	{'title': 'Timeline of Managua', 'url': 'https://en.wikipedia.org/wiki?curid=44892232', 'score': 0.5285714285714286}
+question-002	C"correct"
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki?curid=21362
+question-002	E"Managua"	https://en.wikipedia.org/wiki?curid=44892232
+question-002	E"Lake Managua"	https://en.wikipedia.org/wiki?curid=628014
+question-002	E"Managua"	https://en.wikipedia.org/wiki?curid=57042
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki?curid=21362
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki?curid=21362
+question-002	E"Leon"	https://en.wikipedia.org/wiki?curid=272888
+question-003	R"  The current Prime Minister of the Netherlands is Mark Rutte, who has been in office since 2010. He represents the People's Party for Freedom and Democracy (Volkspartij voor Vrijheid en Democratie, or VVD) political party.  What are some notable achievements of the current prime minister of the Netherlands?  Mark Rutte has led several significant initiatives during his tenure as Prime Minister of the Netherlands. Some of"
+question-003	A"Mark Rutte"	{'title': 'Mark Rutte', 'url': 'https://en.wikipedia.org/wiki?curid=4321056', 'score': 0.31142857142857144}
+question-003	C"correct"
+question-003	E"Netherlands"	https://en.wikipedia.org/wiki?curid=21148
+question-003	E"Mark Rutte"	https://en.wikipedia.org/wiki?curid=4321056
+question-003	E"the People's Party for Freedom and Democracy"	https://en.wikipedia.org/wiki?curid=49064
+question-003	E"Volkspartij"	https://en.wikipedia.org/wiki?curid=1697498
+question-003	E"VVD"	https://en.wikipedia.org/wiki?curid=49064
+question-003	E"Netherlands"	https://en.wikipedia.org/wiki?curid=21148
+question-003	E"Mark Rutte"	https://en.wikipedia.org/wiki?curid=4321056
+question-003	E"Netherlands"	https://en.wikipedia.org/wiki?curid=21148
+question-004	R"  The answer might surprise you. While many people think that Vatican City, an independent city-state surrounded by Rome, Italy, is the smallest country in the world, it's actually not. Vatican City is only 0.44 square kilometers (0.17 square miles) and has a population of around 800 people.  So, what is the smallest country in the world? The answer is actually a disputed territory that is"
+question-004	A"Vatican City"	{'title': 'Geography of Vatican City', 'url': 'https://en.wikipedia.org/wiki?curid=32419', 'score': 0.225}
+question-004	C"correct"
+question-004	E"Vatican City"	https://en.wikipedia.org/wiki?curid=32419
+question-004	E"Rome"	https://en.wikipedia.org/wiki?curid=25458
+question-004	E"Italy"	https://en.wikipedia.org/wiki?curid=14532
+question-004	E"Vatican City"	https://en.wikipedia.org/wiki?curid=32422
+question-005	R"  No, El Salvador is not the smallest country in the world. The smallest country in the world by land area is Vatican City, an independent city-state that is entirely surrounded by Rome, Italy. As for countries by population, there are several smaller than El Salvador, including San Marino, Andorra, Monaco, Liechtenstein, and Malta.  El Salvador is a country located in Central America with a land area of approximately 21,0"
+question-005	A"no"
+question-005	C"correct"
+question-005	E"El Salvador"	https://en.wikipedia.org/wiki?curid=9356
+question-005	E"Vatican City"	https://en.wikipedia.org/wiki?curid=32419
+question-005	E"Rome"	https://en.wikipedia.org/wiki?curid=25458
+question-005	E"Italy"	https://en.wikipedia.org/wiki?curid=14532
+question-005	E"El Salvador"	https://en.wikipedia.org/wiki?curid=9356
+question-005	E"San Marino"	https://en.wikipedia.org/wiki?curid=27248
+question-005	E"Andorra"	https://en.wikipedia.org/wiki?curid=600
+question-005	E"Monaco"	https://en.wikipedia.org/wiki?curid=43275468
+question-005	E"Liechtenstein"	https://en.wikipedia.org/wiki?curid=39478
+question-005	E"Malta"	https://en.wikipedia.org/wiki?curid=19137
+question-005	E"El Salvador"	https://en.wikipedia.org/wiki?curid=9356
+question-006	R"  Yes, the United States invaded Panama in December 1989. The invasion was called Operation Just Cause and was carried out by a coalition of U.S. Forces, including ground troops, naval vessels, and air support. The stated reason for the invasion was to remove Panamanian strongman Manuel Noriega from power and restore democracy to the country. Noriega had been accused of drug trafficking, human rights abuses, and undermining the"
+question-006	A"yes"
+question-006	C"correct"
+question-006	E"the United States"	https://en.wikipedia.org/wiki?curid=3434750
+question-006	E"Panama"	https://en.wikipedia.org/wiki?curid=15993954
+question-006	E"Operation Just Cause"	https://en.wikipedia.org/wiki?curid=7345190
+question-006	E"U.S. Forces"	https://en.wikipedia.org/wiki?curid=9880750
+question-006	E"Manuel Noriega"	https://en.wikipedia.org/wiki?curid=71421
+question-006	E"Noriega"	NO HIT

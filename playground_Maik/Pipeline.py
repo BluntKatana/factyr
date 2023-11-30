@@ -25,4 +25,10 @@ class Pipeline:
 
         # Answer extraction
         print(f"Question type: {self.answer_extractor.get_question_type(question, answer)}")
-        print(f"Answer: {self.answer_extractor.extract_answer(question, answer, entities)}")
+        extracted_answer = self.answer_extractor.extract_answer(question, answer, entities)
+        print(f"Answer: {extracted_answer}")
+
+        fact_check = "correct"
+
+        return answer, extracted_answer, entities, fact_check
+

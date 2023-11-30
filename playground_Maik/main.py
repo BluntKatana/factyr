@@ -30,4 +30,5 @@ if __name__ == "__main__":
 
     for question in questions:
         print(question["question_id"], question["question"])
-        pipeline.process_question(question["question"], question["question_id"])
+        answer, extracted_answer, entities, fact_check = pipeline.process_question(question["question"], question["question_id"])
+        file_processor.write_output(question["question_id"], question["question"], answer, extracted_answer, entities, fact_check)
