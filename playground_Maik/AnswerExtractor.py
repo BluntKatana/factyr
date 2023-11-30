@@ -1,5 +1,6 @@
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
+import spacy
 
 # Constants
 YES_NO_QUESTION = 1
@@ -11,6 +12,7 @@ class AnswerExtractor:
     def __init__(self):
         self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained("nfliu/roberta-large_boolq")
         self._yes_no_tokenizer = AutoTokenizer.from_pretrained("nfliu/roberta-large_boolq")
+        self._nlp = spacy.load("en_core_web_sm")
 
     def extract_answer(self, question, answer, entities):
         """
@@ -71,4 +73,8 @@ class AnswerExtractor:
         :param entities: list of entities in the answer
         """
 
-        return entities[0]
+        # Return first entity that is not in the question
+        question_nlp = self._nlp(question)
+        question_ents = [ent.text for ent in question_nlp.ents]
+
+        return [entity for entity in entities if entity['name'] not in question_ents][0]

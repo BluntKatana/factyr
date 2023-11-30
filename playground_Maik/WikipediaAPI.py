@@ -6,10 +6,9 @@ import time
 
 class WikipediaAPI:
 
-    def __init__(self, wikipedia_file: str):
+    def __init__(self):
         self._session = requests.Session()
         self._url = "https://en.wikipedia.org/w/api.php"
-        # self.load_wikipedia_file(wikipedia_file)
 
         self._cache = {}
 
@@ -46,8 +45,6 @@ class WikipediaAPI:
 
         r = self._session.get(url=self._url, params=params)
         data = r.json()
-
-        ujson.dump(data, open("test.json", "w"))
 
         return data["query"]["search"]
 

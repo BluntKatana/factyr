@@ -119,7 +119,7 @@ class NamedEntityRecognizer:
         6. Punish if the found candidate is also an entity in the text
         """
 
-        wikipedia_api = WikipediaAPI.WikipediaAPI('wikipedia.json.gz')
+        wikipedia_api = WikipediaAPI.WikipediaAPI()
         entity_names = [entity["name"] for entity in self._entities]
 
         for entity in self._entities:
