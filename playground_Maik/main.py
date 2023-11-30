@@ -24,7 +24,7 @@ if __name__ == "__main__":
     questions = file_processor.parse_input()
 
     language_model = LanguageModel()
-    entity_recognizer = NamedEntityRecognizer('en_core_web_sm')
+    entity_recognizer = NamedEntityRecognizer("en_core_web_sm")
     answer_extractor = AnswerExtractor()
     pipeline = Pipeline(language_model, entity_recognizer, answer_extractor)
 
