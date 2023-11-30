@@ -173,7 +173,7 @@ class NamedEntityRecognizer:
                 if similarity > entity['wikipedia_hit']['score']:
                     entity['wikipedia_hit'] = {
                         'title': candidate["title"],
-                        'url': url,
+                        'url': wikipedia_api.get_wikipedia_url_from_id(candidate['pageid']),
                         'score': similarity
                     }
 

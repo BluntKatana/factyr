@@ -48,6 +48,25 @@ class WikipediaAPI:
 
         return data["query"]["search"]
 
+    def get_wikipedia_url_from_id(self, page_id: int):
+        """
+        Use pageid to get Wikipedia article url.
+
+        :param page_id: pageid from Wikipedia article
+        """
+
+        params = {
+            "action": "query",
+            "format": "json",
+            "prop": "info",
+            "inprop": "url",
+            "pageids": page_id
+        }
+
+        r = self._session.get(url=self._url, params=params)
+        data = r.json()['query']['pages']
+
+        return data[list(data.keys())[0]]["fullurl"]
 
     def get_text_url_from_pageid(self, title, page_id, first_char):
         """
