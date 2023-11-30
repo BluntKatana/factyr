@@ -4,7 +4,7 @@ from Pipeline import Pipeline
 from LanguageModel import LanguageModel
 from EntityRecognizer import NamedEntityRecognizer
 from AnswerExtractor import AnswerExtractor
-from FIleProcessor import FileProcessor
+from FileProcessor import FileProcessor
 
 if __name__ == "__main__":
 
