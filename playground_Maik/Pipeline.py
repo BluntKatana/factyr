@@ -25,4 +25,4 @@ class Pipeline:
 
         # Answer extraction
         print(f"Question type: {self.answer_extractor.get_question_type(question, answer)}")
-        # TODO!
+        print(f"Answer: {self.answer_extractor.extract_answer(question, answer, entities)}")

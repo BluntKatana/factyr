@@ -1,5 +1,4 @@
 import sys
-import re
 
 from Pipeline import Pipeline
 from LanguageModel import LanguageModel
@@ -9,8 +8,17 @@ from FIleProcessor import FileProcessor
 
 if __name__ == "__main__":
 
-    input = sys.argv[1]
-    output = sys.argv[2]
+    try:
+        input = sys.argv[1]
+    except IndexError:
+        print("Please provide an input file.")
+        sys.exit()
+
+    try:
+        output = sys.argv[2]
+    except IndexError:
+        print("Please provide an output file.")
+        sys.exit()
 
     file_processor = FileProcessor(input, output)
     questions = file_processor.parse_input()
