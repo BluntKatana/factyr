@@ -1,8 +1,8 @@
 from openie import StanfordOpenIE
 
-class TripleExtraction:
 
-    def extract_openie_triples(self, text):
+class TripleExtraction:
+    def extract_openie_triples(text):
         properties = {
             "openie.affinity_probability_cap": 2 / 3,
         }
@@ -12,6 +12,3 @@ class TripleExtraction:
             triples = client.annotate(text)
 
             return triples
-
-
-
