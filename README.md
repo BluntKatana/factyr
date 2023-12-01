@@ -34,3 +34,8 @@ Team (19): Floris Bos, Pooja Mangal, Kshitij Kavimandan and Maik Larooij
      - [ ] 2. Extract relations from the answer to be able to ask a query to the knowledge base
      - [ ] 3. Based on the query and extracted answer, find a way to check if the answer of the LLM is true or false, with the help of the knowledge base
      - [ ] 4. Wrapping up: write a class/function to feed the LLM query, extracted answer (from last step) and knowledge base and get as output true or false, indicating the correctness of the LLM's answer
+
+## Dependencies
+- nltk.download('punkt')
+- nltk.download('stopwords')
+- spacy install en_core_web_sm

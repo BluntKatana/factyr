@@ -1,6 +1,7 @@
 import spacy
 import nltk
 import WikipediaAPI
+import ujson
 
 
 class NamedEntityRecognizer:
@@ -16,14 +17,19 @@ class NamedEntityRecognizer:
         self._nlp = spacy.load(spacy_model)
         self._entities = []
 
-    def print_entities(self):
+    def print_entities(self, to_file: str | None = None):
+        """
+        Prints the entities found in the text.
+        """
+        if to_file:
+            ujson.dump(self._entities, open(f"question_entities/{to_file}.json", "w"), indent=4)
 
         for entity in self._entities:
             print(f"Entity: {entity['name']}")
             if 'wikipedia_hit' in entity:
                 print(f"Entity Wikipedia hit: {entity['wikipedia_hit']['url']}")
 
-    def process_text(self, text: str, current_entity: str = "") -> list:
+    def process_text(self, text: str, current_entity: str = "", stemmed=True) -> list:
         """
         Processes a text to be able to compare it with other texts.
         Uses Porter stemming and removes stop words.
@@ -31,6 +37,7 @@ class NamedEntityRecognizer:
         :param text: the text to process
         :param current_entity: the current entity to remove from the text
             because it is not relevant for the comparison
+        :return process_text
         """
 
         current_entity_tokenized = nltk.word_tokenize(current_entity)
@@ -38,33 +45,76 @@ class NamedEntityRecognizer:
         stemmer = nltk.PorterStemmer()
         stop_words = nltk.corpus.stopwords.words('english')
 
-        return [stemmer.stem(word, True) for word in text_tokenized
-                if word not in stop_words
-                and word not in current_entity_tokenized
-                and len(word) > 1]
+        # Remove stop words and stemmed stop words from tokenized text
+        context_words = [word for word in text_tokenized
+                         if word not in stop_words
+                         and stemmer.stem(word) not in stop_words
+                         and word not in current_entity_tokenized
+                         and stemmer.stem(word) not in current_entity_tokenized
+                         and len(word) > 1
+                         ]
 
-    def jaccard_similarity(self, a: list, b: list) -> float:
+        # If entity occurence in text is not specified, return all context words
+        # (stemmed or not-stemmed)
+        if stemmed:
+            return [stemmer.stem(word) for word in context_words]
+        return context_words
+
+
+    def get_context_words(self, text: str, current_entity: str, entity_occurence_in_text: int) -> list:
         """
-        Calculates the Jaccard similarity between two lists.
+        Retrieves the context words of a certain entity within a text.
+        Uses distance to entity to assign normalized weights
 
-        :param a: the first list
-        :param b: the second list
+        :param text: the text to get the context words from
+        :param current_entity: the entity for which the context words have to be found and weighted
+        :param entity_occurence_in_text: the occurence of the entity in the text (-1 means not taking into account - equal weights)
+
+        :returns list({ word: str, weight: str }): list of context words with assigned weights
         """
 
-        a = set(a)
-        b = set(b)
-        return len(a.intersection(b)) / len(a.union(b))
+        text_tokenized = nltk.word_tokenize(text)
+        stemmer = nltk.PorterStemmer()
+        context_words = self.process_text(text, current_entity, stemmed=False)
 
-    def get_context_words(self, text: str, entity_name: str) -> list:
-        return self.process_text(text, entity_name)
+         # If entity occurence in text is specified, we want to give more weight to 
+        # the context words that are closer to the entity
+        entity_occurence = 1
+        # TODO: Perhaps use different method to get index of entity in text (supporting entity with multiple words)
+        index_of_entity_in_text = text_tokenized.index(current_entity.split()[0])
 
-    def extract_entities(self, text: str,
-                         keep_types: list = ['GPE', 'PERSON', 'ORG']) -> list:
+        while entity_occurence < entity_occurence_in_text:
+            index_of_entity_in_text = text_tokenized.index(current_entity.split()[0])
+            entity_occurence += 1
+
+        # Retrieve the absolute distance of each word to the entity in the text
+        word_distance_to_entity = {}
+        for idx, word in enumerate(text_tokenized):
+            if word != current_entity:
+                word_distance_to_entity[word] = abs(idx - index_of_entity_in_text)
+
+        # Noramlize the disatnce of each word based on the highest distance
+        # (longer texts have higher distances than shorter texts)
+        highest_distance = max(word_distance_to_entity.values())
+        norm_word_distance_to_entity = {}
+        for word, distance in word_distance_to_entity.items():
+            norm_word_distance_to_entity[word] = distance / highest_distance
+
+        # Get the sum of all CONTEXT WORD distances and normalize the distances to add up to 1
+        sum_of_context_word_distances = sum([distance for word, distance in norm_word_distance_to_entity.items() if word in context_words])
+
+        # Return the stemmed context words with their normalized weights
+        stemmer = nltk.PorterStemmer()
+        return [{'word': stemmer.stem(word), "weight": distance / sum_of_context_word_distances } 
+                    for word, distance in norm_word_distance_to_entity.items() if word in context_words]
+
+    def extract_entities(self, text: str, keep_types: list = ['GPE', 'PERSON', 'ORG']) -> list:
         """
         Extracts entities in the form: [{'name': 'Paris', 'type': 'GPE',
-                                         'context': ['France', 'Eiffel']}, ...]
+                                         'context': [{ word: 'France', weight: '0.7'},
+                                                     { word: 'Eiffel', weight: '0.25'}]
+                                        }, ...]
         Uses SpaCy's named entity recognition.
-
         :param text: the text to extract entities from
         :param keep_types: the types of entities to keep
         """
@@ -73,34 +123,28 @@ class NamedEntityRecognizer:
 
         for sent in doc.sents:
             sent_nlp = self._nlp(sent.text)
-            self._entities.extend([{
-                'name': ent.text,
-                'type': ent.label_,
-                'context': self.get_context_words(sent_nlp.text, ent.text)}
-                for ent in sent_nlp.ents
-                if ent.label_ in keep_types])
+
+            entities_to_add = []
+            # Initialize a dict to count occurence of a certain entity
+            # within a given text (sentence in this case)
+            entity_occurences_in_text = {}
+
+            for ent, idx in zip(sent_nlp.ents, range(len(sent_nlp.ents))):
+                if ent.label_ in keep_types:
+                    if ent.text in entity_occurences_in_text:
+                        entity_occurences_in_text[ent.text] += 1
+                    else:
+                        entity_occurences_in_text[ent.text] = 1
+
+                    entities_to_add.append({
+                        'name': ent.text,
+                        'type': ent.label_,
+                        'context': self.get_context_words(sent_nlp.text, ent.text, entity_occurences_in_text[ent.text])
+                    })
+            self._entities.extend(entities_to_add)
 
         return self._entities
 
-    def is_full_hit(self, entity_name, candidate_title):
-        """
-        Determines if the candidate title is a full hit for the entity name.
-        Full hit = title is equal to entity name (minus stop words).
-
-        :param entity_name: the entity name
-        :param candidate_title: the candidate title
-        """
-
-        stop_words = nltk.corpus.stopwords.words('english')
-
-        candidate_title_norm = " ".join([word.lower()
-                                         for word in candidate_title.split()
-                                         if word.lower() not in stop_words])
-        entity_name_norm = " ".join([word.lower()
-                                     for word in entity_name.split()
-                                     if word.lower() not in stop_words])
-
-        return candidate_title_norm == entity_name_norm
 
     def disambiguate_entities(self,
                               deboost_other_entity=0.1,
@@ -117,14 +161,17 @@ class NamedEntityRecognizer:
         4. Category boost if entity is same category as first entity hit in Wikipedia article
         5. First hit boost if entity is first hit in results from API
         6. Punish if the found candidate is also an entity in the text
+
+        # TODO: Find a better balance between the weight of features
         """
 
-        wikipedia_api = WikipediaAPI.WikipediaAPI('wikipedia.json.gz')
+        wikipedia_api = WikipediaAPI.WikipediaAPI()
         entity_names = [entity["name"] for entity in self._entities]
 
         for entity in self._entities:
 
             candidates = wikipedia_api.get_candidates_from_title(entity["name"], limit=15)
+            context_words = [weighted_word["word"] for weighted_word in entity["context"]]
             entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
 
             for i, candidate in enumerate(candidates):
@@ -132,18 +179,23 @@ class NamedEntityRecognizer:
                 if 'disambiguation' in candidate['title'].lower() or 'list of' in candidate['title'].lower():
                     continue
 
-                text, url = wikipedia_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
-                text_processed = self.process_text(text, entity["name"])
-                title_text_processed = self.process_text(candidate["title"], entity["name"])
+                wikipedia_text, url = wikipedia_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
+                wikipedia_text_processed = self.process_text(wikipedia_text, entity["name"])
+                wikipedia_title_text_processed = self.process_text(candidate["title"], entity["name"])
 
-                if 'may refer to' in text:
+                if 'may refer to' in wikipedia_text:
                     continue
 
+                # Initialize the similarity value - used to check the similarity between an entity and candidate
+                similarity = 0
+
                 # Similarity between context words in text and context words in Wikipedia article title and article
-                similarity = self.jaccard_similarity(entity["context"], text_processed)
-                title_similarity = self.jaccard_similarity(entity["context"], title_text_processed) * boost_title_similarity
-                similarity += title_similarity
-                # print(candidate["title"], similarity)
+                similarity += self.jaccard_similarity(context_words, wikipedia_text_processed)
+                similarity += self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
+
+                # Boost if there is a full hit (entity name === canadidate title)
+                if self.is_full_hit(entity["name"], candidate["title"]):
+                    similarity += boost_full_hit
 
                 # Punish if the found candidate is also an entity in the text
                 if candidate["title"] in entity_names and candidate["title"] != entity["name"]:
@@ -153,13 +205,15 @@ class NamedEntityRecognizer:
                 if i == 0:
                     similarity += boost_first_hit
 
-                # Boost if title is equal to entity name
-                if self.is_full_hit(entity["name"], candidate["title"]):
-                    similarity += boost_full_hit
+                # Add similarity of context words in text and context words in Wikipedia article introtext
+                # based on the weight of context weights
+                for context_word in entity["context"]:
+                    if context_word["word"] in wikipedia_text_processed:
+                        similarity += context_word["weight"]
 
                 # Boost if entity is same category as first entity hit in Wikipedia article
                 if entity['type'] != 'PERSON':
-                    text_nlp = self._nlp(text)
+                    text_nlp = self._nlp(wikipedia_text)
                     if text_nlp.ents:
                         if text_nlp.ents[0].label_ == entity['type']:
                             similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
@@ -169,16 +223,39 @@ class NamedEntityRecognizer:
                 if similarity > entity['wikipedia_hit']['score']:
                     entity['wikipedia_hit'] = {
                         'title': candidate["title"],
-                        'url': url,
+                        'url': wikipedia_api.get_wikipedia_url_from_id(candidate['pageid']),
                         'score': similarity
                     }
 
         return self._entities
 
-# nlp = spacy.load("en_core_web_sm")
-# start_time = time.time()
-# entity_recognizer = NamedEntityRecognizer(nlp)
-# entity_recognizer.extract_entities("Donald Trump and Biden are both from the United States. Ronaldo is from Portugal.")
-# entity_recognizer.disambiguate_entities()
-# entity_recognizer.print_entities()
-# print("--- %s seconds ---" % (time.time() - start_time))
+    # ------
+    # BELOW ARE ALL DISAMBIGUATION FEATURES
+    # ------
+    def jaccard_similarity(self, list_1: list, list_2: list) -> float:
+        """
+        Calculates the Jaccard similarity between two lists of strings.
+
+        :param a: the first list
+        :param b: the second list
+        """
+        # Return 0 if one of the lists is empty
+        if len(list_1) == 0 or len(list_2) == 0:
+            return 0
+        set_1 = set(list_1)
+        set_2 = set(list_2)
+        return len(set_1.intersection(set_2)) / len(set_1.union(set_2))
+
+    def is_full_hit(self, word_1: str, word_2: str):
+        """
+        Determines if a word is a full hit with another word
+        Full hit = word 1 is equal to word 2 (minus stop words).
+
+        :param word_1: the first word to determine full hit for
+        :param word_2: the second word to determine full hit for
+        """
+        stopwords = nltk.corpus.stopwords.words('english')
+        word_1_norm = [word.lower() for word in word_1.split() if word.lower() not in stopwords]
+        word_2_norm = [word.lower() for word in word_2.split() if word.lower() not in stopwords]
+        return word_1_norm == word_2_norm
+

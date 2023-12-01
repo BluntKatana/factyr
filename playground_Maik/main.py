@@ -1,15 +1,24 @@
 import sys
-import re
 
 from Pipeline import Pipeline
 from LanguageModel import LanguageModel
 from EntityRecognizer import NamedEntityRecognizer
 from AnswerExtractor import AnswerExtractor
-from FIleProcessor import FileProcessor
+from FileProcessor import FileProcessor
 
 if __name__ == "__main__":
-    input = "examples\example_input.txt"
-    output = "examples\example_out.txt"
+
+    try:
+        input = sys.argv[1]
+    except IndexError:
+        print("Please provide an input file.")
+        sys.exit()
+
+    try:
+        output = sys.argv[2]
+    except IndexError:
+        print("Please provide an output file.")
+        sys.exit()
 
     file_processor = FileProcessor(input, output)
     questions = file_processor.parse_input()
@@ -21,4 +30,6 @@ if __name__ == "__main__":
 
     for question in questions:
         print(question["question_id"], question["question"])
-        pipeline.process_question(question["question"], question["question_id"])
+        answer, extracted_answer, entities, fact_check = pipeline.process_question(question["question"], question["question_id"])
+        file_processor.write_output(question["question_id"], question["question"], answer, extracted_answer, entities, fact_check)
+        print("---------")

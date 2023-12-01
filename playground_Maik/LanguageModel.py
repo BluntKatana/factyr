@@ -33,4 +33,4 @@ class LanguageModel:
         :param question: question to be answered
         """
         print("Computing the answer (can take some time)...")
-        return self._llm(question)
+        return self._llm(question, max_new_tokens=100, temperature=0.4)

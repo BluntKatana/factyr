@@ -1,9 +1,33 @@
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+import spacy
+
 # Constants
 YES_NO_QUESTION = 1
 ENTITY_QUESTION = 2
 
 
 class AnswerExtractor:
+
+    def __init__(self):
+        self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained("nfliu/roberta-large_boolq")
+        self._yes_no_tokenizer = AutoTokenizer.from_pretrained("nfliu/roberta-large_boolq")
+        self._nlp = spacy.load("en_core_web_sm")
+
+    def extract_answer(self, question, answer, entities):
+        """
+        Extracts the answer from the given question and answer.
+
+        :param question: question to be answered
+        :param answer: answer to the question
+        """
+
+        question_type = self.get_question_type(question, answer)
+
+        if question_type == YES_NO_QUESTION:
+            return self.answer_yes_no_question(question, answer)
+        else:
+            return self.answer_entity_question(question, answer, entities)
 
     def get_question_type(self, question, answer):
         """
@@ -21,3 +45,36 @@ class AnswerExtractor:
             return ENTITY_QUESTION
 
         return YES_NO_QUESTION
+
+    def answer_yes_no_question(self, question, answer):
+        """
+        Answers a yes/no question. Uses a pre-trained model based on
+        'boolq' dataset: 
+
+        :param question: question to be answered
+        :param answer: answer to the question
+        """
+
+        sequence = self._yes_no_tokenizer.encode_plus(question, answer, 
+                                                      return_tensors="pt")['input_ids'].to('cpu')
+
+        with torch.no_grad():
+            logits = self._yes_nomodel(sequence)[0]
+            probabilities = torch.softmax(logits, dim=1).detach().cpu().tolist()[0]
+
+        return {'A': 'yes' if probabilities[0] < probabilities[1] else 'no', 'type': YES_NO_QUESTION}
+
+    def answer_entity_question(self, question, answer, entities):
+        """
+        Answers a question about an entity.
+
+        :param question: question to be answered
+        :param answer: answer to the question
+        :param entities: list of entities in the answer
+        """
+
+        # Return first entity that is not in the question
+        question_nlp = self._nlp(question)
+        question_ents = [ent.text for ent in question_nlp.ents]
+
+        return {'A': [entity for entity in entities if entity['name'] not in question_ents][0], 'type': ENTITY_QUESTION}

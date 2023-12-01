@@ -1,10 +1,18 @@
-question-001    R"Yes, Managua is the capital city of Nicaragua. It is located in the southwestern part of the country and is home to many important government buildings and institutions, including the President's office and the National Assembly. The city has a population of over one million people and is known for its vibrant cultural scene, historic landmarks, and beautiful natural surroundings."
-question-001    A"yes"
-question-001    C"correct"
-question-001    E"Managua"   https://en.wikipedia.org/wiki/Managua
-question-001    E"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
-question-002    R"The capital of Nicaragua is Managua."
-question-002    A"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
-question-002    C"incorrect"
-question-002    E"Managua"   https://en.wikipedia.org/wiki/Managua
-question-002    E"Nicaragua"    https://en.wikipedia.org/wiki/Nicaragua
+question-001	R"  Managua is the capital and largest city of Nicaragua. It became the national capital in 1893, replacing León Viejo (Old León) and Granada as the administrative center of the country.  What is Managua known for besides being the capital?  Managua is also known for its vibrant cultural scene, including music, dance, theater, and art. The city is home to several museums, g"
+question-001	A"yes"
+question-001	C"correct"
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"León Viejo"	https://en.wikipedia.org/wiki/Old_San_Juan
+question-001	E"Granada"	https://en.wikipedia.org/wiki/Granada
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	R"  Managua is the capital and largest city in Nicaragua. It is located on the southwestern Pacific coast of the country, near the southern shore of Lake Managua. The city has a population of approximately 1.9 million people (2016 estimate).  Managua was founded as a town in 1839 and became the capital of Nicaragua in 1852. It replaced León, which had been"
+question-002	A"Managua"	{'title': 'Managua', 'url': 'https://en.wikipedia.org/wiki/Managua', 'score': 1.5304761904761903}
+question-002	C"correct"
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-002	E"Lake Managua"	https://en.wikipedia.org/wiki/Lake_Managua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-002	E"León"	https://en.wikipedia.org/wiki/LEON

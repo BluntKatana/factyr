@@ -13,16 +13,20 @@ class Pipeline:
         :param question_id: id of the question
         :return: answer to the question
         """
-
-        print(f"Question: {question}")
         answer = self.language_model.get_answer(question)
         print(f"Answer: {answer}")
 
         # Entity recognition and linking
         self.entity_recognizer.extract_entities(answer)
         entities = self.entity_recognizer.disambiguate_entities()
-        self.entity_recognizer.print_entities()
+        self.entity_recognizer.print_entities(to_file=question)
 
         # Answer extraction
         print(f"Question type: {self.answer_extractor.get_question_type(question, answer)}")
-        # TODO!
+        extracted_answer = self.answer_extractor.extract_answer(question, answer, entities)
+        print(f"Extracted Answer: {extracted_answer}")
+
+        fact_check = "correct"
+
+        return answer, extracted_answer, entities, fact_check
+
