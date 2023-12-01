@@ -7,7 +7,8 @@ from keyword_extraction_for_questions import AnsweringQuestion
 # <---------------------------Step 1: Take input from the user ----------------------------->
 queryInput = input("Enter your query\n")
 
-extracted_triples_query = TripleExtraction.extract_openie_triples(queryInput)
+# extracted_triples_query = TripleExtraction.extract_openie_triples(queryInput)
+extracted_triples_query = []
 
 if extracted_triples_query:
     # <---------------------------Step 2: Extract Text from wiki -------------------------------->
@@ -35,12 +36,12 @@ if extracted_triples_query:
 
     # <--------------------------- Final check --------------------------->
     if percentageEntity > 40:
-        print(f"The context agrees with the query: {query}")
+        print(f"The context agrees with the query: {queryInput}")
     else:
-        print(f"The context does not agree with the query: {query}")
+        print(f"The context does not agree with the query: {queryInput}")
 
 else:
-    keywords_1, entities_1 = AnsweringQuestion(queryInput)
+    keywords_1, entities_1 = AnsweringQuestion.extract_keywords(queryInput)
 
     text1 = """Italy (Italian: Italia [iˈtaːlja] ⓘ), officially the Italian Republic (Italian: Repubblica Italiana [reˈpubblika itaˈljaːna]), is a country in Southern[13][14][15] and Western[16][a] Europe. Located in the middle of the Mediterranean Sea, it consists of a peninsula delimited by the Alps and surrounded by several islands.[17] Italy shares land borders with France, Switzerland, Austria, Slovenia and the enclaved microstates of Vatican City and San Marino. It has a territorial exclave in Switzerland (Campione) and an archipelago in the African Plate (Pelagie Islands). Italy covers an area of 301,340 km2 (116,350 sq mi),[3] with a population of nearly 60 million;[18] it is the tenth-largest country by land area in the European continent and the third-most populous member state of the European Union. Its capital and largest city is Rome."""
 
@@ -55,12 +56,11 @@ else:
     print(relation)
 
     # Extracting the dictionary which has that relation
-    capital_dict = next(
-        item for item in extracted_triples_text_1 if relation[0] in item.values()
-    )
+    capital_dict = next((item for item in extracted_triples_text_1 if "capital" in str(item.values()).lower()), None)
+
     print(capital_dict)
 
     sentence_final = " ".join(capital_dict.values())
-    keywords_final, entities_final = extract_keywords(sentence_final)
+    keywords_final, entities_final = AnsweringQuestion.extract_keywords(sentence_final)
     # print(f"Keywords in sentence 2: {keywords_final}")
     print(f"Answer {entities_final}")
