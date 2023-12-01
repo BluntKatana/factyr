@@ -15,5 +15,4 @@ class calculatePercentage:
 
             x = len(matching_relations)
             y = len(combined_relations)
-        print(f"Percentage: {(x / y) * 100}")
         return (x / y) * 100
