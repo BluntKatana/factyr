@@ -7,8 +7,8 @@ from keyword_extraction_for_questions import AnsweringQuestion
 # <---------------------------Step 1: Take input from the user ----------------------------->
 queryInput = input("Enter your query\n")
 
-# extracted_triples_query = TripleExtraction.extract_openie_triples(queryInput)
-extracted_triples_query = []
+extracted_triples_query = TripleExtraction.extract_openie_triples(queryInput)
+# extracted_triples_query = []
 
 if extracted_triples_query:
     # <---------------------------Step 2: Extract Text from wiki -------------------------------->
@@ -56,7 +56,14 @@ else:
     print(relation)
 
     # Extracting the dictionary which has that relation
-    capital_dict = next((item for item in extracted_triples_text_1 if "capital" in str(item.values()).lower()), None)
+    capital_dict = next(
+        (
+            item
+            for item in extracted_triples_text_1
+            if "capital" in str(item.values()).lower()
+        ),
+        None,
+    )
 
     print(capital_dict)
 
