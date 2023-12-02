@@ -8,6 +8,7 @@ from keyword_extraction_for_questions import AnsweringQuestion
 queryInput = input("Enter your query\n")
 
 extracted_triples_query = TripleExtraction.extract_openie_triples(queryInput)
+print("Extracted Triple:", extracted_triples_query)
 # extracted_triples_query = []
 
 if extracted_triples_query:
@@ -20,10 +21,10 @@ if extracted_triples_query:
     # <---------------------------Step 3: Perform Triple Extraction -------------------------------->
 
     extracted_triples_text_1 = TripleExtraction.extract_openie_triples(text1)
-    print("Extracted Triple:", extracted_triples_query)
+    print("Extracted Triple 1:", extracted_triples_text_1)
 
-    extracted_triples_text_2 = TripleExtraction.extract_openie_triples(text1)
-    print("Extracted Triple:", extracted_triples_query)
+    extracted_triples_text_2 = TripleExtraction.extract_openie_triples(text2)
+    print("Extracted Triple 2:", extracted_triples_text_2)
 
     # <---------------------------Step 4: Calculate percentage from extracted triples ------------------------------->
     percentageEntity = calculatePercentage.calculate_percentage(
