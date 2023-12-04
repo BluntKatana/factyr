@@ -1,6 +1,12 @@
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import spacy
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression
+import re
+import pickle
+import os
 
 # Constants
 YES_NO_QUESTION = 1
@@ -10,9 +16,56 @@ ENTITY_QUESTION = 2
 class AnswerExtractor:
 
     def __init__(self):
+        self.load_models()
+
+    def load_models(self):
+
+        print("+ Loading models for answer extraction...")
+
+        print("++ Loading question classifier...")
+        # Load trained models
+        if not os.path.exists('data/qc_model_cv.pkl') or not os.path.exists('data/qc_model_lr.pkl'):
+            self.train_question_classifier("data/qc_train.csv")
+        self._q_cv = pickle.load(open('data/qc_model_cv.pkl', 'rb'))
+        self._q_lr = pickle.load(open('data/qc_model_lr.pkl', 'rb'))
+
+        print("++ Loading pre-trained yes/no question extractor...")
         self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained("nfliu/roberta-large_boolq")
         self._yes_no_tokenizer = AutoTokenizer.from_pretrained("nfliu/roberta-large_boolq")
+
+        print("++ Loading SpaCy NLP model...")
         self._nlp = spacy.load("en_core_web_sm")
+
+    def train_question_classifier(self, train_data):
+        """
+        Trains a question classifier based on the given training data.
+        Combination of:
+        https://www.kaggle.com/datasets/rtatman/questionanswer-dataset
+        https://www.kaggle.com/datasets/ananthu017/question-classification
+
+        :param train_data: path to training data file
+        """
+        def process(text):
+            r = re.sub(r'[^a-zA-Z]', ' ', text)
+            r = r.lower()
+            return r
+
+        print("+++ Training question classifier...")
+
+        data = pd.read_csv(train_data).dropna()
+        data['text_proc'] = data['text'].map(process)
+
+        cv = CountVectorizer()
+        X_train_cv = cv.fit_transform(data['text_proc'])
+        y_train = data['type']
+
+        lr = LogisticRegression(max_iter=1000)
+        lr.fit(X_train_cv, y_train)
+
+        with open('data/qc_model_cv.pkl', 'wb') as f:
+            pickle.dump(cv, f)
+        with open('data/qc_model_lr.pkl', 'wb') as f:
+            pickle.dump(lr, f)
 
     def extract_answer(self, question, answer, entities):
         """
@@ -22,7 +75,7 @@ class AnswerExtractor:
         :param answer: answer to the question
         """
 
-        question_type = self.get_question_type(question, answer)
+        question_type = self.classify_question(question)
 
         if question_type == YES_NO_QUESTION:
             return self.answer_yes_no_question(question, answer)
@@ -45,6 +98,26 @@ class AnswerExtractor:
             return ENTITY_QUESTION
 
         return YES_NO_QUESTION
+
+    def classify_question(self, question):
+        """
+        Classifies the question into yes/no or entity question.
+        Uses a trained model based on 'message_types.csv' dataset.
+        Combination of:
+        https://www.kaggle.com/datasets/rtatman/questionanswer-dataset
+        https://www.kaggle.com/datasets/ananthu017/question-classification
+
+        :param question: question to be classified
+        """
+        def process(text):
+            r = re.sub(r'[^a-zA-Z]', ' ', text)
+            r = r.lower()
+            return r
+
+        q_vector = self._q_cv.transform([process(question)])
+        q_pred = self._q_lr.predict(q_vector)
+
+        return YES_NO_QUESTION if q_pred[0] == 'yn' else ENTITY_QUESTION
 
     def answer_yes_no_question(self, question, answer):
         """
