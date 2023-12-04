@@ -22,7 +22,7 @@ class Pipeline:
         self.entity_recognizer.print_entities(to_file=question)
 
         # Answer extraction
-        print(f"Question type: {self.answer_extractor.get_question_type(question, answer)}")
+        print(f"Question type: {self.answer_extractor.classify_question(question)}")
         extracted_answer = self.answer_extractor.extract_answer(question, answer, entities)
         print(f"Extracted Answer: {extracted_answer}")
 

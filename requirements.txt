@@ -4,3 +4,5 @@ nltk
 ctransformers
 torch
 transformers
+scikit-learn
+pandas

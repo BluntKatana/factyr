@@ -153,3 +153,4 @@ cython_debug/
 refined
 wikidata
 NameWikiJSON
+question_entities

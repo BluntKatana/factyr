@@ -14,6 +14,7 @@ class NamedEntityRecognizer:
 
     def __init__(self, spacy_model):
 
+        print("+ Setting up named entity recognizer/linker...")
         self._nlp = spacy.load(spacy_model)
         self._entities = []
 
