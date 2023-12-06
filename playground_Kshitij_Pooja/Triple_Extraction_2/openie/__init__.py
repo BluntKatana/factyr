@@ -1,1 +1,1 @@
-from openie.openie import StanfordOpenIE  # noqa
+from Triple_Extraction_2.openie.openie import StanfordOpenIE  # noqa
