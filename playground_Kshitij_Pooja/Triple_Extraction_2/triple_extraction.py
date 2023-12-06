@@ -1,4 +1,4 @@
-from openie import StanfordOpenIE
+from Triple_Extraction_2.openie import StanfordOpenIE
 
 
 class TripleExtraction:
