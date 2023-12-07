@@ -38,9 +38,9 @@ class WikipediaAPI:
             "action": "query",
             "format": "json",
             "list": "search",
-            "srsearch": f'{title} -intitle:"disambiguation" -intitle:"list of"',
+            "srwhat": "text",
+            "srsearch": f'{title}',
             "srlimit": limit,
-            "srprop": "pageid|titlesnippet",
         }
 
         r = self._session.get(url=self._url, params=params)
@@ -75,38 +75,41 @@ class WikipediaAPI:
         :param page_id: pageid from Wikipedia article
         """
 
-        # params = {
-        #         "action": "query",
-        #         "format": "json",
-        #         "prop": "info|extracts",
-        #         "inprop": "url",
-        #         "exintro": True,
-        #         "pageids": page_id
-        #     }
+        params = {
+                "action": "query",
+                "format": "json",
+                "prop": "info|extracts",
+                "inprop": "url",
+                "exintro": True,
+                "pageids": page_id
+            }
 
-        # r = self._session.get(url=self._url, params=params)
-        # data = r.json()['query']['pages']
+        r = self._session.get(url=self._url, params=params)
+        data = r.json()['query']['pages']
 
-        # text = data[list(data.keys())[0]]["extract"]
-        # url = data[list(data.keys())[0]]["fullurl"]
+        text = data[list(data.keys())[0]]["extract"]
+        url = data[list(data.keys())[0]]["fullurl"]
 
         # print(f"Loading Wikipedia file for {first_char}...")
 
-        try:
-            text_dict = self._cache[first_char]
-        except KeyError:
+        # try:
+        #     text_dict = self._cache[first_char]
+        # except KeyError:
 
-            try:
-                with open(f"NameWikiJSON/{first_char}.json", "r") as f:
-                    text_dict = ujson.load(f)
-                    self._cache[first_char] = text_dict
-            except FileNotFoundError:
-                text_dict = {}
+        #     try:
+        #         with open(f"wikidata/{first_char}.json", "r") as f:
+        #             text_dict = ujson.load(f)
+        #             self._cache[first_char] = text_dict
+        #     except FileNotFoundError:
+        #         print(f"Failed to load Wikipedia file for {first_char}.")
+        #         text_dict = {}
 
-        try:
-            text = text_dict[title]
-        except KeyError:
-            text = ""
-        url = f"https://en.wikipedia.org/wiki?curid={page_id}"
+        # try:
+        #     text = text_dict[str(page_id)]
+        #     print(text[:10])
+        # except KeyError:
+        #     text = ""
+        #     print(f"Failed to load Wikipedia text for {page_id}.")
+        # url = f"https://en.wikipedia.org/wiki?curid={page_id}"
 
         return text, url

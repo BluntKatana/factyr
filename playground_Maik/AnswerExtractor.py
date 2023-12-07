@@ -160,5 +160,6 @@ class AnswerExtractor:
         extracted_answer = self._entity_extractor(QA_input)
 
         similarities = [(entity, difflib.SequenceMatcher(None, entity['name'], extracted_answer['answer']).ratio()) for entity in entities]
+        most_similar = max(similarities, key=lambda x: x[1])[0]
 
-        return {'A': max(similarities, key=lambda x: x[1])[0], 'type': ENTITY_QUESTION}
+        return {'A': most_similar, 'type': ENTITY_QUESTION}, most_similar['name']

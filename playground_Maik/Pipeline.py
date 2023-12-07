@@ -5,7 +5,7 @@ class Pipeline:
         self.entity_recognizer = entity_recognizer
         self.answer_extractor = answer_extractor
 
-    def process_question(self, question, question_id):
+    def process_question(self, question):
         """
         Processes a question and returns the answer.
 
@@ -23,8 +23,8 @@ class Pipeline:
 
         # Answer extraction
         print(f"Question type: {self.answer_extractor.classify_question(question)}")
-        extracted_answer = self.answer_extractor.extract_answer(question, answer, entities)
-        print(f"Extracted Answer: {extracted_answer}")
+        extracted_answer, answer_text = self.answer_extractor.extract_answer(question, answer, entities)
+        print(f"Extracted Answer: {answer_text}")
 
         fact_check = "correct"
 
