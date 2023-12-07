@@ -6,6 +6,9 @@ from EntityRecognizer import NamedEntityRecognizer
 from AnswerExtractor import AnswerExtractor
 from FileProcessor import FileProcessor
 
+import warnings
+warnings.filterwarnings("ignore")
+
 if __name__ == "__main__":
 
     try:

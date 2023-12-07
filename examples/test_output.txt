@@ -1,0 +1,59 @@
+question-001	R"  Managua is the capital and largest city of Nicaragua. It became the national capital in 1893, replacing León Viejo (Old León) which was destroyed by an earthquake in 1610.  What are some interesting facts about Managua, Nicaragua?  Managua is located on the southwestern shore of Lake Xolotlán (Lago de Managua). It has"
+question-001	A"yes"
+question-001	C"correct"
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"León Viejo"	https://en.wikipedia.org/wiki/Old_San_Juan
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Lake_Managua
+question-001	E"Lago de Managua"	https://en.wikipedia.org/wiki/Lake_Managua
+question-002	R"  The capital city of Nicaragua is Managua. It is located in the western part of the country, on the shores of Lake Managua. The city has a population of over 2 million people and serves as the political, economic, and cultural center of Nicaragua. Some notable landmarks in Managua include the Ruben Dario National Theatre, the Cathedral of Managua, and the National Palace."
+question-002	A"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	C"correct"
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-002	E"Lake Managua"	https://en.wikipedia.org/wiki/Tipitapa
+question-002	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Old_Cathedral_of_Managua
+question-002	E"the Ruben Dario National Theatre"	https://en.wikipedia.org/wiki/Managua
+question-002	E"Managua"	https://en.wikipedia.org/wiki/Old_Cathedral_of_Managua
+question-002	E"the National Palace"	https://en.wikipedia.org/wiki/National_Home_Palace
+question-003	R"  The current Prime Minister of the Netherlands is Mark Rutte, who has been in office since 2010. He represents the People's Party for Freedom and Democracy (Volkspartij voor Vrijheid en Democratie, or VVD) political party.  What are some key issues facing the Netherlands currently?  Some of the key issues facing the Netherlands currently include:  1. COVID-19 pandemic response: The country has been"
+question-003	A"Mark Rutte"	https://en.wikipedia.org/wiki/Mark_Rutte
+question-003	C"correct"
+question-003	E"Netherlands"	https://en.wikipedia.org/wiki/Netherlands
+question-003	E"Mark Rutte"	https://en.wikipedia.org/wiki/Mark_Rutte
+question-003	E"the People's Party for Freedom and Democracy"	https://en.wikipedia.org/wiki/People%27s_Party_for_Freedom_and_Democracy
+question-003	E"Volkspartij"	https://en.wikipedia.org/wiki/Aruban_People%27s_Party
+question-003	E"VVD"	https://en.wikipedia.org/wiki/People%27s_Party_for_Freedom_and_Democracy
+question-003	E"Netherlands"	https://en.wikipedia.org/wiki/Politics_of_the_Netherlands
+question-003	E"Netherlands"	https://en.wikipedia.org/wiki/Greater_Netherlands
+question-004	R"  The smallest country in the world, based on landmass, is Vatican City. It has an area of just 0.44 square kilometers (0.17 square miles) and a population of around 800 people. However, some other microstates, such as Monaco and San Marino, are also quite small in terms of both landmass and population.  What is the smallest country by population?  The smallest country by population is"
+question-004	A"Vatican City"	https://en.wikipedia.org/wiki/Geography_of_Vatican_City
+question-004	C"correct"
+question-004	E"Vatican City"	https://en.wikipedia.org/wiki/Geography_of_Vatican_City
+question-004	E"Monaco"	https://en.wikipedia.org/wiki/Demographics_of_Monaco
+question-004	E"San Marino"	https://en.wikipedia.org/wiki/San_Marino
+question-005	R"  No, El Salvador is not the smallest country in the world. The smallest country in the world by land area is Vatican City, an independent city-state enclaved within Rome, Italy. As for countries by population size, there are several smaller than El Salvador, including San Marino, Andorra, Monaco, Liechtenstein, and Maldives.  El Salvador is a country located in Central America with a land area of approximately 21,"
+question-005	A"no"
+question-005	C"correct"
+question-005	E"El Salvador"	https://en.wikipedia.org/wiki/El_Salvador%E2%80%93United_States_relations
+question-005	E"Vatican City"	https://en.wikipedia.org/wiki/Geography_of_Vatican_City
+question-005	E"Rome"	https://en.wikipedia.org/wiki/Rome
+question-005	E"Italy"	https://en.wikipedia.org/wiki/Italy
+question-005	E"El Salvador"	https://en.wikipedia.org/wiki/El_Salvador
+question-005	E"San Marino"	https://en.wikipedia.org/wiki/San_Marino
+question-005	E"Andorra"	https://en.wikipedia.org/wiki/Andorra
+question-005	E"Monaco"	https://en.wikipedia.org/wiki/Monaco_City
+question-005	E"Liechtenstein"	https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Liechtenstein
+question-005	E"Maldives"	https://en.wikipedia.org/wiki/Transport_in_the_Maldives
+question-005	E"El Salvador"	https://en.wikipedia.org/wiki/El_Salvador
+question-006	R"  The United States invasion of Panama, codenamed Operation Just Cause, was launched on December 20, 1989. The operation involved approximately 24,000 American troops and was aimed at overthrowing the government of Manuel Noriega, who had been accused of drug trafficking and other crimes.  The invasion was a major military operation that lasted for several weeks and resulted in significant loss of life on both sides. The United States"
+question-006	A"yes"
+question-006	C"correct"
+question-006	E"The United States"	https://en.wikipedia.org/wiki/United_States
+question-006	E"Panama"	https://en.wikipedia.org/wiki/Panama%E2%80%93United_States_relations
+question-006	E"Operation Just Cause"	https://en.wikipedia.org/wiki/United_States_invasion_of_Panama
+question-006	E"Manuel Noriega"	https://en.wikipedia.org/wiki/Manuel_Noriega
+question-006	E"The United States"	https://en.wikipedia.org/wiki/United_States
