@@ -22,8 +22,6 @@ class NamedEntityRecognizer:
         """
         Prints the entities found in the text.
         """
-        if to_file:
-            ujson.dump(self._entities, open(f"question_entities/{to_file}.json", "w"), indent=4)
 
         for entity in self._entities:
             print(f"Entity: {entity['name']}")

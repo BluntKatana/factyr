@@ -53,7 +53,7 @@ class FileProcessor:
             if extracted_answer['type'] == 1:
                 file.write(f'{question_id}\tA"{extracted_answer["A"]}"\n')
             else:
-                file.write(f'{question_id}\tA"{extracted_answer["A"]["name"]}"\t{extracted_answer["A"]["wikipedia_hit"]}\n')
+                file.write(f'{question_id}\tA"{extracted_answer["A"]["name"]}"\t{extracted_answer["A"]["wikipedia_hit"]["url"]}\n')
 
             # Fact check
             file.write(f'{question_id}\tC"{fact_check}"\n')

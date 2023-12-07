@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, AutoModelForQuestionAnswering, pipeline
 import spacy
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
@@ -7,6 +7,7 @@ from sklearn.linear_model import LogisticRegression
 import re
 import pickle
 import os
+import difflib
 
 # Constants
 YES_NO_QUESTION = 1
@@ -35,6 +36,12 @@ class AnswerExtractor:
 
         print("++ Loading SpaCy NLP model...")
         self._nlp = spacy.load("en_core_web_sm")
+
+        print("++ Loading entity answer extractor...")
+        model_name = "deepset/roberta-base-squad2"
+        model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self._entity_extractor = pipeline('question-answering', model=model, tokenizer=tokenizer)
 
     def train_question_classifier(self, train_data):
         """
@@ -146,8 +153,12 @@ class AnswerExtractor:
         :param entities: list of entities in the answer
         """
 
-        # Return first entity that is not in the question
-        question_nlp = self._nlp(question)
-        question_ents = [ent.text for ent in question_nlp.ents]
+        QA_input = {
+            'question': question,
+            'context': answer
+        }
+        extracted_answer = self._entity_extractor(QA_input)
 
-        return {'A': [entity for entity in entities if entity['name'] not in question_ents][0], 'type': ENTITY_QUESTION}
+        similarities = [(entity, difflib.SequenceMatcher(None, entity['name'], extracted_answer['answer']).ratio()) for entity in entities]
+
+        return {'A': max(similarities, key=lambda x: x[1])[0], 'type': ENTITY_QUESTION}
