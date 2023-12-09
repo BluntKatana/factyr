@@ -2,7 +2,7 @@ import sys
 
 from Pipeline import Pipeline
 from LanguageModel import LanguageModel
-from EntityRecognizer import NamedEntityRecognizer
+from EntityRecognizer_TESTING import NamedEntityRecognizer
 from AnswerExtractor import AnswerExtractor
 
 import pandas as pd
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         dict_data = {
             "QuestionID": question["QuestionID"],
             "Question": question["Question"],
-            "Answer": answer.replace('\n', ' '),
+            "Answer": answer.replace('\n', ' ').strip(),
             "ExtractedAnswer": extracted_answer,
             "Entities": entities,
             "FactCheck": fact_check

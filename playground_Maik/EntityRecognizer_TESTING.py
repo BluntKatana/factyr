@@ -72,7 +72,7 @@ class NamedEntityRecognizer:
         :returns list({ word: str, weight: str }): list of context words with assigned weights
         """
 
-        text_tokenized = nltk.word_tokenize(text)
+        text_tokenized = [word.strip('.') for word in nltk.word_tokenize(text)]
         stemmer = nltk.PorterStemmer()
         context_words = self.process_text(text, current_entity, stemmed=False)
 
@@ -81,7 +81,8 @@ class NamedEntityRecognizer:
         entity_occurence = 1
         # TODO: Perhaps use different method to get index of entity in text (supporting entity with multiple words)
 
-        index_of_entity_in_text = text_tokenized.index(nltk.word_tokenize(current_entity)[0])
+        # index_of_entity_in_text = text_tokenized.index(nltk.word_tokenize(current_entity)[0])
+        index_of_entity_in_text = [i for i, word in enumerate(text_tokenized) if current_entity.split()[0] in word][0]
 
         while entity_occurence < entity_occurence_in_text:
             index_of_entity_in_text = text_tokenized.index(current_entity.split()[0])
@@ -108,7 +109,8 @@ class NamedEntityRecognizer:
         return [{'word': stemmer.stem(word), "weight": distance / sum_of_context_word_distances } 
                     for word, distance in norm_word_distance_to_entity.items() if word in context_words]
 
-    def extract_entities(self, text: str, exclude_types: list = ['ORDINAL', 'CARDINAL', 'TIME']) -> list:
+    def extract_entities(self, text: str, exclude_types: list = ['ORDINAL', 'CARDINAL', 'TIME', 'QUANTITY',
+                                                                 'MONEY', 'PERCENT']) -> list:
         """
         Extracts entities in the form: [{'name': 'Paris', 'type': 'GPE',
                                          'context': [{ word: 'France', weight: '0.7'},
@@ -173,11 +175,22 @@ class NamedEntityRecognizer:
 
         for entity in self._entities:
 
-            print(f"Disambiguating entity: {entity['name']}...")
+            print(f"Disambiguating entity: {entity['name']}, {entity['type']}...")
 
             candidates = wikipedia_api.get_candidates_from_title(entity["name"], limit=15)
             context_words = [weighted_word["word"] for weighted_word in entity["context"]]
             entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
+
+            # Dates are very sensitive to mistakes, so we just take the first hit
+            if entity['type'] == 'DATE':
+                entity['wikipedia_hit'] = {
+                        'title': candidates[0]["title"],
+                        'url': wikipedia_api.get_wikipedia_url_from_id(candidates[0]['pageid']),
+                        'score': 1
+                    }
+                
+                print(f"Best candidate: {entity['wikipedia_hit']['title']}", '\n')
+                continue
 
             all_candidates = []
 
@@ -227,7 +240,7 @@ class NamedEntityRecognizer:
                 for context_word in entity["context"]:
                     if context_word["word"] in wikipedia_text_processed:
                         context_score += context_word["weight"]
-                        similarity += context_word["weight"]
+                        # similarity += context_word["weight"]
                         nr_of_found_context_words += 1
 
                 this_candidate_score_data['context_score'] = context_score
@@ -240,15 +253,17 @@ class NamedEntityRecognizer:
                 #             similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
                 #             this_candidate_score_data['same_category'] = boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
 
+                position_boost = 1/(i+1)
+
                 name_title_ratio = difflib.SequenceMatcher(None, entity["name"], candidate["title"]).ratio()
-                nice_score = (name_title_ratio * 2) * (nr_of_found_context_words / len(entity["context"]))
-                similarity += nice_score if nice_score else max(name_title_ratio / 2, nr_of_found_context_words / len(entity["context"]))
-                print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]))
+                nice_score = (name_title_ratio + position_boost) * ((nr_of_found_context_words / len(entity["context"])) + context_score + 0.1)
+                similarity += nice_score
+                print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]), nice_score)
                 # Update entity with best candidate
                 if similarity > entity['wikipedia_hit']['score']:
                     entity['wikipedia_hit'] = {
                         'title': candidate["title"],
-                        'url': wikipedia_api.get_wikipedia_url_from_id(candidate['pageid']),
+                        'url': url,
                         'score': similarity
                     }
 
@@ -295,6 +310,6 @@ class NamedEntityRecognizer:
         return word_1_norm == word_2_norm
 
 
-er = NamedEntityRecognizer("en_core_web_sm")
-er.extract_entities("a) 1940 b) 1942 c) 1945 d) 1947  Answer: c) 1945  The Second World War, also known as the \"Great Patriotic War\" in Russia and the \"Pacific War\" in Asia, ended on September 2, 1945. The war officially came to a close with the signing of two documents")
-entities = er.disambiguate_entities()
+# er = NamedEntityRecognizer("en_core_web_sm")
+# er.extract_entities(  '""The Birth of Venus"" is a painting by the Italian Renaissance artist Sandro Botticelli. It depicts the goddess Venus, or Aphrodite in Greek mythology, emerging from the sea on a shell. The painting is now housed at the Uffizi Gallery in Florence, Italy.  Botticelli was an influential figure of the Florentine Renaissance and created many other famous works such as ""The Adoration of the')
+# entities = er.disambiguate_entities()

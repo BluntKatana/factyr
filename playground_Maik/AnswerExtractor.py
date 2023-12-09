@@ -142,7 +142,9 @@ class AnswerExtractor:
             logits = self._yes_nomodel(sequence)[0]
             probabilities = torch.softmax(logits, dim=1).detach().cpu().tolist()[0]
 
-        return {'A': 'yes' if probabilities[0] < probabilities[1] else 'no', 'type': YES_NO_QUESTION}
+        yn_answer = 'yes' if probabilities[0] < probabilities[1] else 'no'
+
+        return {'A': yn_answer, 'type': YES_NO_QUESTION}, yn_answer
 
     def answer_entity_question(self, question, answer, entities):
         """
