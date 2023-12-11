@@ -81,11 +81,17 @@ class NamedEntityRecognizer:
         entity_occurence = 1
         # TODO: Perhaps use different method to get index of entity in text (supporting entity with multiple words)
 
-        # index_of_entity_in_text = text_tokenized.index(nltk.word_tokenize(current_entity)[0])
-        index_of_entity_in_text = [i for i, word in enumerate(text_tokenized) if current_entity.split()[0] in word][0]
+        try:
+            index_of_entity_in_text = text_tokenized.index(nltk.word_tokenize(current_entity)[0])
+        except:
+            index_of_entity_in_text = sorted([(i, difflib.SequenceMatcher(None, nltk.word_tokenize(current_entity), word).ratio()) for i, word in enumerate(text_tokenized)], key=lambda x: (x[1], -x[0]), reverse=True)[0][0]
+        # index_of_entity_in_text = [i for i, word in enumerate(text_tokenized) if current_entity.split()[0] in word][0]
 
         while entity_occurence < entity_occurence_in_text:
-            index_of_entity_in_text = text_tokenized.index(current_entity.split()[0])
+            try:
+                index_of_entity_in_text = text_tokenized.index(nltk.word_tokenize(current_entity)[0])
+            except:
+                index_of_entity_in_text = sorted([(i, difflib.SequenceMatcher(None, nltk.word_tokenize(current_entity), word).ratio()) for i, word in enumerate(text_tokenized)], key=lambda x: (x[1], -x[0]), reverse=True)[0][0]
             entity_occurence += 1
 
         # Retrieve the absolute distance of each word to the entity in the text
@@ -258,7 +264,7 @@ class NamedEntityRecognizer:
                 name_title_ratio = difflib.SequenceMatcher(None, entity["name"], candidate["title"]).ratio()
                 nice_score = (name_title_ratio + position_boost) * ((nr_of_found_context_words / len(entity["context"])) + context_score + 0.1)
                 similarity += nice_score
-                print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]), nice_score)
+                # print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]), nice_score)
                 # Update entity with best candidate
                 if similarity > entity['wikipedia_hit']['score']:
                     entity['wikipedia_hit'] = {
@@ -272,7 +278,7 @@ class NamedEntityRecognizer:
                     'score_data': this_candidate_score_data
                 })
 
-            print(f"Best candidate: {entity['wikipedia_hit']['title']}", '\n')
+            # print(f"Best candidate: {entity['wikipedia_hit']['title']}", '\n')
             entity_data[entity['name']] = all_candidates
 
         ujson.dump(entity_data, open(f"entity_data.json", 'w'), indent=4)
