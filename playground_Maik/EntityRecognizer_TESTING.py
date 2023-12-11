@@ -1,8 +1,8 @@
 import spacy
 import nltk
 import WikipediaAPI
-import ujson
 import difflib
+import multiprocessing as mp
 
 class NamedEntityRecognizer:
     """
@@ -151,8 +151,102 @@ class NamedEntityRecognizer:
                 })
         self._entities.extend(entities_to_add)
 
-        ujson.dump(self._entities, open(f"entities.json", 'w'), indent=4)
         return self._entities
+    
+    def disambiguate_entity(self, entity_i, wikipedia_api, return_dict):
+
+        entity = self._entities[entity_i]
+
+        print(f"Disambiguating entity: {entity['name']}, {entity['type']}...")
+
+        candidates = wikipedia_api.get_candidates_from_title(entity["name"], limit=15)
+        entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
+
+        # Dates are very sensitive to mistakes, so we just take the first hit
+        if entity['type'] == 'DATE':
+            entity['wikipedia_hit'] = {
+                    'title': candidates[0]["title"],
+                    'url': wikipedia_api.get_wikipedia_url_from_id(candidates[0]['pageid']),
+                    'score': 1
+                }
+            
+            print(f"Best candidate: {entity['wikipedia_hit']['title']}", '\n')
+            return
+
+        for i, candidate in enumerate(candidates):
+
+            if 'disambiguation' in candidate['title'].lower() or 'list of' in candidate['title'].lower():
+                continue
+
+            this_candidate_score_data = {}
+
+            wikipedia_text, url = wikipedia_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
+            wikipedia_text_processed = self.process_text(wikipedia_text, entity["name"])
+
+            if 'may refer to' in wikipedia_text:
+                continue
+
+            # Initialize the similarity value - used to check the similarity between an entity and candidate
+            similarity = 0
+
+            # Similarity between context words in text and context words in Wikipedia article title and article
+            # similarity += self.jaccard_similarity(context_words, wikipedia_text_processed)
+            # this_candidate_score_data['text_similarity'] = self.jaccard_similarity(context_words, wikipedia_text_processed)
+            # similarity += self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
+            # this_candidate_score_data['title_similarity'] = self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
+
+            # Boost if there is a full hit (entity name === canadidate title)
+            # if self.is_full_hit(entity["name"], candidate["title"]):
+            #     similarity += boost_full_hit
+            #     this_candidate_score_data['full_hit'] = boost_full_hit
+
+
+            # Punish if the found candidate is also an entity in the text
+            # if candidate["title"] in entity_names and candidate["title"] != entity["name"]:
+            #     similarity -= deboost_other_entity
+            #     this_candidate_score_data['other_entity'] = -deboost_other_entity
+
+            # Boost first hit
+            # if i == 0:
+            #     similarity += boost_first_hit
+            #     this_candidate_score_data['first_hit'] = boost_first_hit
+
+            # Add similarity of context words in text and context words in Wikipedia article introtext
+            # based on the weight of context weights
+            context_score = 0
+            nr_of_found_context_words = 0
+            for context_word in entity["context"]:
+                if context_word["word"] in wikipedia_text_processed:
+                    context_score += context_word["weight"]
+                    # similarity += context_word["weight"]
+                    nr_of_found_context_words += 1
+
+            this_candidate_score_data['context_score'] = context_score
+
+            # Boost if entity is same category as first entity hit in Wikipedia article
+            # if entity['type'] != 'PERSON':
+            #     text_nlp = self._nlp(wikipedia_text)
+            #     if text_nlp.ents:
+            #         if text_nlp.ents[0].label_ == entity['type']:
+            #             similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
+            #             this_candidate_score_data['same_category'] = boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
+
+            position_boost = 1/(i+1)
+
+            name_title_ratio = difflib.SequenceMatcher(None, entity["name"], candidate["title"]).ratio()
+            nice_score = (name_title_ratio + position_boost) * ((nr_of_found_context_words / len(entity["context"])) + context_score + 0.1)
+            similarity += nice_score
+            # print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]), nice_score)
+            # Update entity with best candidate
+            if similarity > entity['wikipedia_hit']['score']:
+                entity['wikipedia_hit'] = {
+                    'title': candidate["title"],
+                    'url': url,
+                    'score': similarity
+                }
+
+        return_dict[entity_i] = entity
+
 
 
     def disambiguate_entities(self,
@@ -179,109 +273,21 @@ class NamedEntityRecognizer:
 
         entity_data = {}
 
-        for entity in self._entities:
+        processes = []
+        manager = mp.Manager()
+        return_data = manager.dict()
+        pool = mp.Pool(mp.cpu_count())
 
-            print(f"Disambiguating entity: {entity['name']}, {entity['type']}...")
+        for i in range(len(self._entities)):
+            pool.apply_async(self.disambiguate_entity, args=(i, wikipedia_api, return_data))
 
-            candidates = wikipedia_api.get_candidates_from_title(entity["name"], limit=15)
-            context_words = [weighted_word["word"] for weighted_word in entity["context"]]
-            entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
-
-            # Dates are very sensitive to mistakes, so we just take the first hit
-            if entity['type'] == 'DATE':
-                entity['wikipedia_hit'] = {
-                        'title': candidates[0]["title"],
-                        'url': wikipedia_api.get_wikipedia_url_from_id(candidates[0]['pageid']),
-                        'score': 1
-                    }
-                
-                print(f"Best candidate: {entity['wikipedia_hit']['title']}", '\n')
-                continue
-
-            all_candidates = []
-
-            for i, candidate in enumerate(candidates):
-
-                if 'disambiguation' in candidate['title'].lower() or 'list of' in candidate['title'].lower():
-                    continue
-
-                this_candidate_score_data = {}
-
-                wikipedia_text, url = wikipedia_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
-                wikipedia_text_processed = self.process_text(wikipedia_text, entity["name"])
-                wikipedia_title_text_processed = self.process_text(candidate["title"], entity["name"])
-
-                if 'may refer to' in wikipedia_text:
-                    continue
-
-                # Initialize the similarity value - used to check the similarity between an entity and candidate
-                similarity = 0
-
-                # Similarity between context words in text and context words in Wikipedia article title and article
-                # similarity += self.jaccard_similarity(context_words, wikipedia_text_processed)
-                # this_candidate_score_data['text_similarity'] = self.jaccard_similarity(context_words, wikipedia_text_processed)
-                # similarity += self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
-                # this_candidate_score_data['title_similarity'] = self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
-
-                # Boost if there is a full hit (entity name === canadidate title)
-                # if self.is_full_hit(entity["name"], candidate["title"]):
-                #     similarity += boost_full_hit
-                #     this_candidate_score_data['full_hit'] = boost_full_hit
-
-
-                # Punish if the found candidate is also an entity in the text
-                # if candidate["title"] in entity_names and candidate["title"] != entity["name"]:
-                #     similarity -= deboost_other_entity
-                #     this_candidate_score_data['other_entity'] = -deboost_other_entity
-
-                # Boost first hit
-                # if i == 0:
-                #     similarity += boost_first_hit
-                #     this_candidate_score_data['first_hit'] = boost_first_hit
-
-                # Add similarity of context words in text and context words in Wikipedia article introtext
-                # based on the weight of context weights
-                context_score = 0
-                nr_of_found_context_words = 0
-                for context_word in entity["context"]:
-                    if context_word["word"] in wikipedia_text_processed:
-                        context_score += context_word["weight"]
-                        # similarity += context_word["weight"]
-                        nr_of_found_context_words += 1
-
-                this_candidate_score_data['context_score'] = context_score
-
-                # Boost if entity is same category as first entity hit in Wikipedia article
-                # if entity['type'] != 'PERSON':
-                #     text_nlp = self._nlp(wikipedia_text)
-                #     if text_nlp.ents:
-                #         if text_nlp.ents[0].label_ == entity['type']:
-                #             similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
-                #             this_candidate_score_data['same_category'] = boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
-
-                position_boost = 1/(i+1)
-
-                name_title_ratio = difflib.SequenceMatcher(None, entity["name"], candidate["title"]).ratio()
-                nice_score = (name_title_ratio + position_boost) * ((nr_of_found_context_words / len(entity["context"])) + context_score + 0.1)
-                similarity += nice_score
-                # print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]), nice_score)
-                # Update entity with best candidate
-                if similarity > entity['wikipedia_hit']['score']:
-                    entity['wikipedia_hit'] = {
-                        'title': candidate["title"],
-                        'url': url,
-                        'score': similarity
-                    }
-
-                all_candidates.append({
-                    'candidate': candidate,
-                    'score_data': this_candidate_score_data
-                })
-
-            # print(f"Best candidate: {entity['wikipedia_hit']['title']}", '\n')
-            entity_data[entity['name']] = all_candidates
-
-        ujson.dump(entity_data, open(f"entity_data.json", 'w'), indent=4)
+            # p = mp.Process(target=self.disambiguate_entity, args=(i, wikipedia_api, return_data))
+            # processes.append(p)
+            # p.start()
+        pool.close()
+        pool.join()
+        for i in range(len(self._entities)):
+            self._entities[i] = return_data[i]
 
         return self._entities
 
@@ -316,6 +322,7 @@ class NamedEntityRecognizer:
         return word_1_norm == word_2_norm
 
 
-# er = NamedEntityRecognizer("en_core_web_sm")
-# er.extract_entities(  '""The Birth of Venus"" is a painting by the Italian Renaissance artist Sandro Botticelli. It depicts the goddess Venus, or Aphrodite in Greek mythology, emerging from the sea on a shell. The painting is now housed at the Uffizi Gallery in Florence, Italy.  Botticelli was an influential figure of the Florentine Renaissance and created many other famous works such as ""The Adoration of the')
-# entities = er.disambiguate_entities()
+er = NamedEntityRecognizer("en_core_web_sm")
+er.extract_entities(  '""The Birth of Venus"" is a painting by the Italian Renaissance artist Sandro Botticelli. It depicts the goddess Venus, or Aphrodite in Greek mythology, emerging from the sea on a shell. The painting is now housed at the Uffizi Gallery in Florence, Italy.  Botticelli was an influential figure of the Florentine Renaissance and created many other famous works such as ""The Adoration of the')
+entities = er.disambiguate_entities()
+er.print_entities()

@@ -25,13 +25,16 @@ class AnswerExtractor:
 
         print("++ Loading question classifier...")
         # Load trained models
-        if not os.path.exists('data/qc_model_cv.pkl') or not os.path.exists('data/qc_model_lr.pkl'):
-            self.train_question_classifier("data/qc_train.csv")
-        self._q_cv = pickle.load(open('data/qc_model_cv.pkl', 'rb'))
-        self._q_lr = pickle.load(open('data/qc_model_lr.pkl', 'rb'))
+        if not os.path.exists('models/qc_model_cv.pkl') or not os.path.exists('models/qc_model_lr.pkl'):
+            self.train_question_classifier("data/qc_train.csv", "models")
+        self._q_cv = pickle.load(open('models/qc_model_cv.pkl', 'rb'))
+        self._q_lr = pickle.load(open('models/qc_model_lr.pkl', 'rb'))
 
         print("++ Loading pre-trained yes/no question extractor...")
-        self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained("nfliu/roberta-large_boolq")
+        try:
+            self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained("models/yes_no_model")
+        except:
+            self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained("nfliu/roberta-large_boolq")
         self._yes_no_tokenizer = AutoTokenizer.from_pretrained("nfliu/roberta-large_boolq")
 
         print("++ Loading SpaCy NLP model...")
@@ -39,11 +42,14 @@ class AnswerExtractor:
 
         print("++ Loading entity answer extractor...")
         model_name = "deepset/roberta-base-squad2"
-        model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+        try:
+            model = AutoModelForQuestionAnswering.from_pretrained("models/entity_model")
+        except:
+            model = AutoModelForQuestionAnswering.from_pretrained(model_name)
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         self._entity_extractor = pipeline('question-answering', model=model, tokenizer=tokenizer)
 
-    def train_question_classifier(self, train_data):
+    def train_question_classifier(self, train_data, save_path):
         """
         Trains a question classifier based on the given training data.
         Combination of:
@@ -69,9 +75,9 @@ class AnswerExtractor:
         lr = LogisticRegression(max_iter=1000)
         lr.fit(X_train_cv, y_train)
 
-        with open('data/qc_model_cv.pkl', 'wb') as f:
+        with open(f'{save_path}/qc_model_cv.pkl', 'wb') as f:
             pickle.dump(cv, f)
-        with open('data/qc_model_lr.pkl', 'wb') as f:
+        with open(f'{save_path}/data/qc_model_lr.pkl', 'wb') as f:
             pickle.dump(lr, f)
 
     def extract_answer(self, question, answer, entities):

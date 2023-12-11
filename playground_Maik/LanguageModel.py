@@ -32,10 +32,14 @@ class LanguageModel:
         else:
 
             print(f"++ You have more than 10 GB of memory. {LARGE_MODEL_REPO} will be loaded.")
-            self._llm = AutoModelForCausalLM.from_pretrained(
-                LARGE_MODEL_REPO,
-                model_file=LARGE_MODEL_FILE,
-                model_type="llama")
+            try:
+                self._llm = AutoModelForCausalLM.from_pretrained(model_path_or_repo_id='models/zephyr-7b-beta.Q5_K_M.gguf')
+            except:
+                self._llm = AutoModelForCausalLM.from_pretrained(
+                    LARGE_MODEL_REPO,
+                    model_file=LARGE_MODEL_FILE,
+                    model_type="llama"
+                )
 
     def get_answer(self, question: str) -> str:
         """

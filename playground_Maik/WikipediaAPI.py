@@ -1,8 +1,4 @@
 import requests
-import ujson
-import gzip
-import time
-
 
 class WikipediaAPI:
 
@@ -12,19 +8,6 @@ class WikipediaAPI:
 
         self._cache = {}
 
-    def load_wikipedia_file(self, wikipedia_file: str):
-        """
-        Load Wikipedia file.
-
-        :param wikipedia_file: path to Wikipedia file
-        """
-
-        print("Loading Wikipedia file...")
-
-        with gzip.open(wikipedia_file, "rt") as f:
-            self._wikipedia_texts = ujson.load(f)
-
-        time.sleep(5)
 
     def get_candidates_from_title(self, title: str, limit: int = 15):
         """
