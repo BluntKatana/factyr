@@ -44,7 +44,7 @@ class WikipediaText:
             wikipedia_url = link
             intro_text = self.get_wikipedia_intro(wikipedia_url)
 
-            max_length = 1200
+            max_length = 6000
 
             if intro_text:
                 if len(intro_text) > max_length:
