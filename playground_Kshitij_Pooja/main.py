@@ -68,7 +68,7 @@ else:
         (
             item
             for item in extracted_triples_text
-            if "capital" in str(item.values()).lower()
+            if relation in str(item.values()).lower()
         ),
         None,
     )
