@@ -55,6 +55,8 @@ else:
 
     extracted_triples_text = TripleExtraction.extract_openie_triples(extracted_wiki[0])
 
+    print(extracted_triples_text)
+
     # Finding what the relation is (need to make this better)
     relation = [
         element
@@ -65,12 +67,12 @@ else:
 
     # Extracting the dictionary which has that relation
     capital_dict = next(
-    (
-        item[2]  # Extract the object (third element) from the triple
-        for item in extracted_triples_text
-        if any(word.lower() in " ".join(item).lower() for word in relation)
-    ),
-    None,
+        (
+            item[2]  # Extract the object (third element) from the triple
+            for item in extracted_triples_text
+            if any(word.lower() in " ".join(item).lower() for word in relation)
+        ),
+        None,
     )
 
     print(capital_dict)
