@@ -65,40 +65,26 @@ else:
     ]
     print(relation)
 
-    # Extracting the dictionary which has that relation
-    # capital_dict = next(
-    #     (
-    #         item[2]  # Extract the object (third element) from the triple
-    #         for item in extracted_triples_text
-    #         if any(word.lower() in " ".join(item).lower() for word in relation)
-    #     ),
-    #     None,
-    # )
-
-    # print(capital_dict)
-    
-    # exists = any(any(keyword.lower() in item[field].lower() for keyword in relation) for item in extracted_triples_text for field in ['subject', 'relation', 'object'])
-
-
-    # print(exists)
-
-    # capital_dict = next(
-    #     (item for item in extracted_triples_text if any(keyword.lower() in item[field].lower() for keyword in relation for field in ['subject', 'relation', 'object'])),
-    #     None
-    # )
-
-    # print("Final Relation required:", capital_dict)
-
-    capital_dict = [item for item in extracted_triples_text if any(keyword.lower() in item[field].lower() for keyword in relation for field in ['subject', 'relation', 'object'])]
+    capital_dict = [
+        item
+        for item in extracted_triples_text
+        if any(
+            keyword.lower() in item[field].lower()
+            for keyword in relation
+            for field in ["subject", "relation", "object"]
+        )
+    ]
 
     # Print the matching dictionaries
     for matching_dict in capital_dict:
         print(matching_dict)
 
         sentence_final = " ".join(matching_dict.values())
-        keywords_final, entities_final = AnsweringQuestion.extract_keywords(sentence_final)
+        keywords_final, entities_final = AnsweringQuestion.extract_keywords(
+            sentence_final
+        )
 
-        if(entities_final):
+        if entities_final:
             break
 
     print(f"Answer {entities_final}")
