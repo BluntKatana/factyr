@@ -16,7 +16,7 @@ class WikipediaText:
 
             # Find the div with id 'mw-content-text' and then find the first two paragraphs inside it
             content_div = soup.find("div", {"class": "mw-content-ltr mw-parser-output"})
-            paragraphs = content_div.find_all("p")[:4]
+            paragraphs = content_div.find_all("p")[:6]
 
             # Extract text from the paragraphs
             intro_text = "\n".join([paragraph.get_text() for paragraph in paragraphs])
