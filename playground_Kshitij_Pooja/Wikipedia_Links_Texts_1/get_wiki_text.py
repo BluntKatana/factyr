@@ -16,7 +16,7 @@ class WikipediaText:
 
             # Find the div with id 'mw-content-text' and then find the first two paragraphs inside it
             content_div = soup.find("div", {"class": "mw-content-ltr mw-parser-output"})
-            paragraphs = content_div.find_all("p")[:6]
+            paragraphs = content_div.find_all("p")[:4]
 
             # Extract text from the paragraphs
             intro_text = "\n".join([paragraph.get_text() for paragraph in paragraphs])
@@ -44,7 +44,7 @@ class WikipediaText:
             wikipedia_url = link
             intro_text = self.get_wikipedia_intro(wikipedia_url)
 
-            max_length = 6000
+            max_length = 1200
 
             if intro_text:
                 if len(intro_text) > max_length:
