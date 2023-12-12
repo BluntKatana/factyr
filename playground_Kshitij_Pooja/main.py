@@ -87,7 +87,7 @@ else:
         None
     )
 
-    print("Final Answer:", capital_dict)
+    print("Final Relation required:", capital_dict)
 
 
     sentence_final = " ".join(capital_dict.values())
