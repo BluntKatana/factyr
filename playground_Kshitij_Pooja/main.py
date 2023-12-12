@@ -65,12 +65,12 @@ else:
 
     # Extracting the dictionary which has that relation
     capital_dict = next(
-        (
-            item
-            for item in extracted_triples_text
-            if relation in str(item.values()).lower()
-        ),
-        None,
+    (
+        item[2]  # Extract the object (third element) from the triple
+        for item in extracted_triples_text
+        if any(word.lower() in " ".join(item).lower() for word in relation)
+    ),
+    None,
     )
 
     print(capital_dict)
