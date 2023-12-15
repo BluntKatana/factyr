@@ -1,8 +1,0 @@
-ctransformers
-transformers
-spacy
-nltk
-pandas
-scikit-learn
-torch
-psutil

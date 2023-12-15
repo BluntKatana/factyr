@@ -1,6 +1,6 @@
 import spacy
 import nltk
-import WikipediaAPI
+from WikiAPI import WikiAPI
 import difflib
 import multiprocessing as mp
 
@@ -153,7 +153,7 @@ class NamedEntityRecognizer:
 
         return self._entities
     
-    def disambiguate_entity(self, entity_i, wikipedia_api, return_dict):
+    def disambiguate_entity(self, entity_i, wikipedia_api, return_dict, return_first=False):
 
         entity = self._entities[entity_i]
 
@@ -163,12 +163,17 @@ class NamedEntityRecognizer:
         entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
 
         # Dates are very sensitive to mistakes, so we just take the first hit
-        if entity['type'] == 'DATE':
+        if entity['type'] == 'DATE' or return_first:
+            url, wikidata = wikipedia_api.get_wikipedia_url_from_id(candidates[0]['pageid'])
             entity['wikipedia_hit'] = {
                     'title': candidates[0]["title"],
-                    'url': wikipedia_api.get_wikipedia_url_from_id(candidates[0]['pageid']),
+                    'page_id': candidates[0]["pageid"],
+                    'url': url,
+                    'wikidata_id': wikidata,
                     'score': 1
                 }
+            
+            return_dict[entity_i] = entity
             
             print(f"Best candidate: {entity['wikipedia_hit']['title']}", '\n')
             return
@@ -180,7 +185,7 @@ class NamedEntityRecognizer:
 
             this_candidate_score_data = {}
 
-            wikipedia_text, url = wikipedia_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
+            wikipedia_text, url, wikidata_id = wikipedia_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
             wikipedia_text_processed = self.process_text(wikipedia_text, entity["name"])
 
             if 'may refer to' in wikipedia_text:
@@ -238,23 +243,24 @@ class NamedEntityRecognizer:
             similarity += nice_score
             # print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]), nice_score)
             # Update entity with best candidate
+            # print(f"Candidate: {candidate['title']}, score: {similarity}")
             if similarity > entity['wikipedia_hit']['score']:
                 entity['wikipedia_hit'] = {
                     'title': candidate["title"],
                     'url': url,
-                    'score': similarity
+                    'page_id': candidate["pageid"],
+                    'score': similarity,
+                    'wikidata_id': wikidata_id
                 }
 
         return_dict[entity_i] = entity
-
-
 
     def disambiguate_entities(self,
                               deboost_other_entity=0,
                               boost_first_hit=0.2,
                               boost_full_hit=0.1,
                               boost_same_category=0.2,
-                              boost_title_similarity=2):
+                              boost_title_similarity=2, return_first=False):
         """
         Tries to disambiguate entities and find the best Wikipedia article for each entity.
         Uses features:
@@ -268,7 +274,7 @@ class NamedEntityRecognizer:
         # TODO: Find a better balance between the weight of features
         """
 
-        wikipedia_api = WikipediaAPI.WikipediaAPI()
+        wikipedia_api = WikiAPI()
         entity_names = [entity["name"] for entity in self._entities]
 
         entity_data = {}
@@ -279,7 +285,7 @@ class NamedEntityRecognizer:
         pool = mp.Pool(mp.cpu_count())
 
         for i in range(len(self._entities)):
-            pool.apply_async(self.disambiguate_entity, args=(i, wikipedia_api, return_data))
+            pool.apply_async(self.disambiguate_entity, args=(i, wikipedia_api, return_data, return_first))
 
             # p = mp.Process(target=self.disambiguate_entity, args=(i, wikipedia_api, return_data))
             # processes.append(p)
@@ -322,7 +328,7 @@ class NamedEntityRecognizer:
         return word_1_norm == word_2_norm
 
 
-er = NamedEntityRecognizer("en_core_web_sm")
-er.extract_entities(  '""The Birth of Venus"" is a painting by the Italian Renaissance artist Sandro Botticelli. It depicts the goddess Venus, or Aphrodite in Greek mythology, emerging from the sea on a shell. The painting is now housed at the Uffizi Gallery in Florence, Italy.  Botticelli was an influential figure of the Florentine Renaissance and created many other famous works such as ""The Adoration of the')
-entities = er.disambiguate_entities()
-er.print_entities()
+# er = NamedEntityRecognizer("en_core_web_sm")
+# er.extract_entities(  '""The Birth of Venus"" is a painting by the Italian Renaissance artist Sandro Botticelli. It depicts the goddess Venus, or Aphrodite in Greek mythology, emerging from the sea on a shell. The painting is now housed at the Uffizi Gallery in Florence, Italy.  Botticelli was an influential figure of the Florentine Renaissance and created many other famous works such as ""The Adoration of the')
+# entities = er.disambiguate_entities()
+# er.print_entities()

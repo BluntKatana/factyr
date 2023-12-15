@@ -1,22 +1,43 @@
-from steps.fact_checker import FactChecker
-from steps.language_model import LanguageModel
-from steps.named_entity_recognizer import NamedEntityRecognizer
-from steps.processor import Processor
+import sys
+
+from Pipeline import Pipeline
+from LanguageModel import LanguageModel
+from EntityRecognizer_TESTING import NamedEntityRecognizer
+from AnswerExtractor import AnswerExtractor
+from FileProcessor import FileProcessor
+from FactChecker import FactChecker
+
+import warnings
+warnings.filterwarnings("ignore")
+
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 if __name__ == "__main__":
-    # Example usage:
-    language_model = LanguageModel()
-    entity_recognizer = NamedEntityRecognizer()
-    knowledge_base = ["Managua", "Nicaragua"]  # Your knowledge base of relevant entities
 
-    fact_checker = FactChecker(knowledge_base)
-    processor = Processor(language_model, entity_recognizer, fact_checker)
+    try:
+        input = sys.argv[1]
+    except IndexError:
+        print("Please provide an input file.")
+        sys.exit()
 
-    # Read questions from an input file
-    input_file = "examples/example_input.txt"
-    with open(input_file, 'r') as file:
-        lines = file.readlines()
-        for idx, line in enumerate(lines):
-            question_id, question = line.strip().split('\t')
-            output = processor.process_question(question, question_id)
-            print(output)
+    try:
+        output = sys.argv[2]
+    except IndexError:
+        print("Please provide an output file.")
+        sys.exit()
+
+    file_processor = FileProcessor(input, output)
+    questions = file_processor.parse_input()
+
+    # language_model = LanguageModel()
+    entity_recognizer = NamedEntityRecognizer("en_core_web_sm")
+    answer_extractor = AnswerExtractor()
+    fact_checker = FactChecker(entity_recognizer)
+    pipeline = Pipeline(entity_recognizer, answer_extractor, fact_checker)
+
+    for question in questions:
+        print(question["question_id"], question["question"])
+        answer, extracted_answer, entities, fact_check = pipeline.process_question(question["question"])
+        file_processor.write_output(question["question_id"], question["question"], answer, extracted_answer, entities, fact_check)
+        print("---------")

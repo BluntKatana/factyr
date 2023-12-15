@@ -1,0 +1,10 @@
+question-001	R"  Managua is the capital and largest city of Nicaragua. It is located in the west of the country, on the southern shore of Lake Managua at an altitude of 39 meters (128 feet) above sea level. The city has a population of approximately 1.9 million inhabitants.  Why is Managua important to Nicaragua?  Managua is the political, cultural, and economic center of Nicar"
+question-001	A"yes"
+question-001	C"incorrect"
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"Lake Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Nicaragua"	https://en.wikipedia.org/wiki/Nicaragua
+question-001	E"Managua"	https://en.wikipedia.org/wiki/Managua
+question-001	E"Nicar"	https://en.wikipedia.org/wiki/Missouri_School_of_Journalism

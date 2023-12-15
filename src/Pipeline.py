@@ -2,10 +2,10 @@ from LanguageModel import LanguageModel
 
 class Pipeline:
 
-    def __init__(self, language_model, entity_recognizer, answer_extractor):
-        # self.language_model = language_model
+    def __init__(self, entity_recognizer, answer_extractor, fact_checker):
         self.entity_recognizer = entity_recognizer
         self.answer_extractor = answer_extractor
+        self.fact_checker = fact_checker
 
     def process_question(self, question):
         """
@@ -30,7 +30,7 @@ class Pipeline:
         extracted_answer, answer_text = self.answer_extractor.extract_answer(question, answer, entities)
         print(f"Extracted Answer: {answer_text}")
 
-        fact_check = "correct"
+        fact_check = self.fact_checker.check(question, extracted_answer)
 
         return answer, extracted_answer, entities, fact_check
-
+    
