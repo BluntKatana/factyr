@@ -1,3 +1,13 @@
+#------------------------------------------------------#
+#
+#   openie.py is a wrapper for Stanford OpenIE.
+#   Not written by us, but used in our project.
+#   It is used to extract triples from a sentence.
+#   src: https://github.com/philipperemy/stanford-openie-python/blob/master/openie/openie.py
+#
+#------------------------------------------------------#        
+
+
 import os
 import tempfile
 from pathlib import Path
@@ -19,12 +29,12 @@ class StanfordOpenIE:
             **kwargs
     ):
         if install_dir_path is None:
-            default_path = Path('~/.stanfordnlp_resources').expanduser()
-            self.install_dir = os.environ.get("OPENIE_INSTALL_PATH", default_path)
+            default_path = Path('models').expanduser()
+            self.install_dir = default_path
         else:
             self.install_dir = Path(install_dir_path)
         self.install_dir.mkdir(exist_ok=True)
-        if len([d for d in self.install_dir.glob('*') if d.is_dir()]) == 0:
+        if len([d for d in self.install_dir.glob('stanford*') if d.is_dir()]) == 0:
             # No coreNLP directories. Let's check for ZIP archives as well.
             zip_files = [d for d in self.install_dir.glob('*') if d.suffix == '.zip']
             if len(zip_files) == 0:
@@ -39,11 +49,11 @@ class StanfordOpenIE:
             zf = ZipFile(output_filename)
             zf.extractall(path=self.install_dir)
             zf.close()
-        target_dir = [d for d in self.install_dir.glob('*') if d.is_dir()][0]
+        target_dir = [d for d in self.install_dir.glob('stanford*') if d.is_dir()][0]
 
-        os.environ['CORENLP_HOME'] = str(self.install_dir / target_dir)
+        os.environ['CORENLP_HOME'] = str(target_dir)
         from stanfordnlp.server import CoreNLPClient
-        self.client = CoreNLPClient(annotators=['openie'], memory='8G', *args, **kwargs)
+        self.client = CoreNLPClient(annotators=['openie'], memory='8G', *args, **kwargs, be_quiet=True)
 
     def annotate(self, text: str, properties_key: str = None, properties: dict = None, simple_format: bool = True):
         """

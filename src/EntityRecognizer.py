@@ -2,6 +2,7 @@ import spacy
 import nltk
 import difflib
 import multiprocessing as mp
+# from WikiAPI import WikiAPI
 
 class NamedEntityRecognizer:
     """
@@ -24,9 +25,9 @@ class NamedEntityRecognizer:
         """
 
         for entity in self._entities:
-            print(f"Entity: {entity['name']}")
+            print(f" Entity: {entity['name']}")
             if 'wikipedia_hit' in entity:
-                print(f"Entity Wikipedia hit: {entity['wikipedia_hit']['url']}")
+                print(f" Entity Wikipedia hit: {entity['wikipedia_hit']['url']}")
 
     def process_text(self, text: str, current_entity: str = "", stemmed=True) -> list:
         """
@@ -157,8 +158,6 @@ class NamedEntityRecognizer:
 
         entity = self._entities[entity_i]
 
-        print(f"Disambiguating entity: {entity['name']}, {entity['type']}...")
-
         candidates = self._wiki_api.get_candidates_from_title(entity["name"], limit=15)
         entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
 
@@ -174,8 +173,6 @@ class NamedEntityRecognizer:
                 }
             
             return_dict[entity_i] = entity
-            
-            print(f"Best candidate: {entity['wikipedia_hit']['title']}", '\n')
             return
 
         for i, candidate in enumerate(candidates):
@@ -185,7 +182,7 @@ class NamedEntityRecognizer:
 
             this_candidate_score_data = {}
 
-            wikipedia_text, url, wikidata_id = self._wiki_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
+            wikipedia_text, url, wikidata_id = self._wiki_api.get_text_url_from_pageid(candidate["pageid"])
             wikipedia_text_processed = self.process_text(wikipedia_text, entity["name"])
 
             if 'may refer to' in wikipedia_text:
@@ -255,12 +252,7 @@ class NamedEntityRecognizer:
 
         return_dict[entity_i] = entity
 
-    def disambiguate_entities(self,
-                              deboost_other_entity=0,
-                              boost_first_hit=0.2,
-                              boost_full_hit=0.1,
-                              boost_same_category=0.2,
-                              boost_title_similarity=2, return_first=False):
+    def disambiguate_entities(self, return_first=False):
         """
         Tries to disambiguate entities and find the best Wikipedia article for each entity.
         Uses features:
@@ -274,12 +266,6 @@ class NamedEntityRecognizer:
         # TODO: Find a better balance between the weight of features
         """
 
-        wikipedia_api = self._wiki_api
-        entity_names = [entity["name"] for entity in self._entities]
-
-        entity_data = {}
-
-        processes = []
         manager = mp.Manager()
         return_data = manager.dict()
         pool = mp.Pool(mp.cpu_count())
@@ -287,11 +273,9 @@ class NamedEntityRecognizer:
         for i in range(len(self._entities)):
             pool.apply_async(self.disambiguate_entity, args=(i, return_data, return_first))
 
-            # p = mp.Process(target=self.disambiguate_entity, args=(i, self._wiki_api, return_data))
-            # processes.append(p)
-            # p.start()
         pool.close()
         pool.join()
+
         for i in range(len(self._entities)):
             self._entities[i] = return_data[i]
 
@@ -327,8 +311,8 @@ class NamedEntityRecognizer:
         word_2_norm = [word.lower() for word in word_2.split() if word.lower() not in stopwords]
         return word_1_norm == word_2_norm
 
-
-# er = NamedEntityRecognizer("en_core_web_sm")
+# wiki_api = WikiAPI()
+# er = NamedEntityRecognizer("en_core_web_sm", wiki_api)
 # er.extract_entities(  '""The Birth of Venus"" is a painting by the Italian Renaissance artist Sandro Botticelli. It depicts the goddess Venus, or Aphrodite in Greek mythology, emerging from the sea on a shell. The painting is now housed at the Uffizi Gallery in Florence, Italy.  Botticelli was an influential figure of the Florentine Renaissance and created many other famous works such as ""The Adoration of the')
 # entities = er.disambiguate_entities()
 # er.print_entities()

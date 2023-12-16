@@ -1,6 +1,2 @@
 question-001    Is Managua the capital of Nicaragua?
 question-002    What is the capital of Nicaragua?
-question-003    Who is the prime minister of the Netherlands?
-question-004    What is the smallest country in the world?
-question-005    Is El Salvador the smallest country in the world?
-question-006    Did the United States invade Panama in 1989?

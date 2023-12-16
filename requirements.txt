@@ -9,3 +9,4 @@ psutil
 stanfordnlp
 bs4
 requests
+wget

@@ -1,6 +1,4 @@
 import spacy
-import requests
-from bs4 import BeautifulSoup
 import difflib
 import re
 
@@ -95,7 +93,6 @@ class FactChecker:
             new_relation['relation'] = " ".join([str(word) for word in self._nlp(relation['relation']) if not word.is_stop])
 
             if new_relation['relation']:
-                print(new_relation['relation'])
                 new_relations.append(new_relation)
 
         return new_relations

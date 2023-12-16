@@ -1,7 +1,7 @@
-import sys
+import argparse
 
 from src.Pipeline import Pipeline
-from EntityRecognizer import NamedEntityRecognizer
+from src.EntityRecognizer import NamedEntityRecognizer
 from src.AnswerExtractor import AnswerExtractor
 from src.FileProcessor import FileProcessor
 from src.FactChecker import FactChecker
@@ -12,32 +12,28 @@ warnings.filterwarnings("ignore")
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 if __name__ == "__main__":
 
-    try:
-        input = sys.argv[1]
-    except IndexError:
-        print("Please provide an input file.")
-        sys.exit()
+    parser = argparse.ArgumentParser(description='factyr: an answer/entity extraction and fact checking pipeline.')
+    parser.add_argument('--input', '-i', type=str, help='input file (txt)', required=True)
+    parser.add_argument('--output', '-o', type=str, help='output file (txt)', default='factyr_output.txt')
+    parser.add_argument('--verbose', '-v', action='store_true', help='verbose mode')
+    args = parser.parse_args()
 
-    try:
-        output = sys.argv[2]
-    except IndexError:
-        print("Please provide an output file.")
-        sys.exit()
-
-    file_processor = FileProcessor(input, output)
+    file_processor = FileProcessor(args.input, args.output)
     questions = file_processor.parse_input()
 
-    entity_recognizer = NamedEntityRecognizer("en_core_web_sm")
-    answer_extractor = AnswerExtractor()
-    fact_checker = FactChecker(entity_recognizer)
     wiki_api = WikiAPI()
-    pipeline = Pipeline(entity_recognizer, answer_extractor, fact_checker)
+    entity_recognizer = NamedEntityRecognizer("en_core_web_sm", wiki_api)
+    answer_extractor = AnswerExtractor('models', 'data')
+    fact_checker = FactChecker(entity_recognizer, wiki_api)
+    pipeline = Pipeline(entity_recognizer, answer_extractor, fact_checker, verbose=args.verbose)
 
     for question in questions:
-        print(question["question_id"], question["question"])
-        answer, extracted_answer, entities, fact_check = pipeline.process_question(question["question"])
-        file_processor.write_output(question["question_id"], question["question"], answer, extracted_answer, entities, fact_check)
-        print("---------")
+        answer, extracted_answer, entities, fact_check = pipeline.process_question(question["question"], question["question_id"])
+        file_processor.write_output(question["question_id"], 
+                                    question["question"], 
+                                    answer, extracted_answer,
+                                    entities, fact_check)

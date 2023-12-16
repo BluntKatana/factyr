@@ -16,7 +16,9 @@ ENTITY_QUESTION = 2
 
 class AnswerExtractor:
 
-    def __init__(self):
+    def __init__(self, model_path, data_path):
+        self._model_path = model_path
+        self._data_path = data_path
         self.load_models()
 
     def load_models(self):
@@ -25,14 +27,14 @@ class AnswerExtractor:
 
         print("++ Loading question classifier...")
         # Load trained models
-        if not os.path.exists('models/qc_model_cv.pkl') or not os.path.exists('models/qc_model_lr.pkl'):
-            self.train_question_classifier("data/qc_train.csv", "models")
-        self._q_cv = pickle.load(open('models/qc_model_cv.pkl', 'rb'))
-        self._q_lr = pickle.load(open('models/qc_model_lr.pkl', 'rb'))
+        if not os.path.exists(f'{self._model_path}/qc_model_cv.pkl') or not os.path.exists(f'{self._model_path}/qc_model_lr.pkl'):
+            self.train_question_classifier(f"{self._data_path}/qc_train.csv", self._model_path)
+        self._q_cv = pickle.load(open(f'{self._model_path}/qc_model_cv.pkl', 'rb'))
+        self._q_lr = pickle.load(open(f'{self._model_path}/qc_model_lr.pkl', 'rb'))
 
         print("++ Loading pre-trained yes/no question extractor...")
         try:
-            self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained("models/yes_no_model")
+            self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained(f"{self._model_path}/yes_no_model")
         except:
             self._yes_nomodel = AutoModelForSequenceClassification.from_pretrained("nfliu/roberta-large_boolq")
         self._yes_no_tokenizer = AutoTokenizer.from_pretrained("nfliu/roberta-large_boolq")
@@ -43,7 +45,7 @@ class AnswerExtractor:
         print("++ Loading entity answer extractor...")
         model_name = "deepset/roberta-base-squad2"
         try:
-            model = AutoModelForQuestionAnswering.from_pretrained("models/entity_model")
+            model = AutoModelForQuestionAnswering.from_pretrained(f"{self._model_path}/entity_model")
         except:
             model = AutoModelForQuestionAnswering.from_pretrained(model_name)
         tokenizer = AutoTokenizer.from_pretrained(model_name)
