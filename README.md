@@ -1,5 +1,5 @@
 # factyr
- Practical assignment for the course: Web Data Processing Systems.
+Practical assignment for the course: Web Data Processing Systems.
 
 > ### Assignment Instructions
 > You are called to implement a program that receives as input a question (or more in general a text to be completed), which we henceforth call A and returns as output four things:
@@ -19,7 +19,7 @@ We recommend running the program with Docker. This way, you do not have to insta
 
 To run the program, you need to have Docker installed. To install Docker, follow the instructions on the [Docker website](https://docs.docker.com/get-docker/). Pull the latest Docker image from Docker Hub by running: 
 ```
-docker pull larooij/factyr
+docker pull larooij/factyr:latest
 ```
 Simply run the program by running the Docker image:
 ```
@@ -74,4 +74,34 @@ options:
   --output OUTPUT, -o OUTPUT
                         output file (txt)
   --verbose, -v         verbose mode
+```
+
+## Project structure
+
+The project is structured as follows:
+```
+/factyr-app
+├── Dockerfile
+├── README.md
+├── main.py                                 # main file to run the program
+├── requirements.txt
+├── src
+    ├── AnswerExtraction.py                 # answer extraction module
+    ├── EntityExtraction.py                 # entity extraction module
+    ├── FactChecking.py                     # fact checking module
+    ├── LanguageModel.py                    # language model module   
+    ├── Pipeline.py                         # pipeline module (combines all modules)
+    ├── WikiAPI.py                          # Wiki API module -> gateway to Wikidata/Wikipedia
+    ├── utils                               # utility functions        
+    │   ├── openie.py                       # imported OpenIE module            
+├── models                                  # models used by the program -> not on GitHub, but included in Docker image
+    ├── entity_model                        # model used for entity answer extraction
+    ├── yes_no_model                        # model used for yes/no answer extraction
+    ├── stanford-corenlp-4.5.3              # Stanford CoreNLP library
+    ├── qc_model_cv.pkl                     # CountVectorizer used for question type classification     
+    ├── qc_model_lr.pkl                     # LogisticRegression used for question type classification
+    ├── llama-2-7b-chat.Q5_K_M.gguf         # LLAMA language model
+    ├── zephyr-7b-beta.Q5_K_M.gguf          # Zephyr language model
+├── data                                    # data used for the program / evaluation           
+├── test                                    # test/example files
 ```
