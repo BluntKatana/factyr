@@ -10,3 +10,4 @@ stanfordnlp
 bs4
 requests
 wget
+protobuf==3.20.*
