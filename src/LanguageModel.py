@@ -2,8 +2,9 @@ import psutil
 from ctransformers import AutoModelForCausalLM
 
 class LanguageModel:
-    def __init__(self, verbose=True) -> None:
+    def __init__(self, model_path, verbose=True) -> None:
         self.verbose = verbose
+        self._model_path = model_path
         self.load_model()
 
     def load_model(self):
@@ -25,18 +26,20 @@ class LanguageModel:
 
             if self.verbose:
                 print(f" WARNING: You have less than 10 GB of memory. This might cause problems. {SMALL_MODEL_REPO} will be loaded.")
-            self._llm = AutoModelForCausalLM.from_pretrained(
-                SMALL_MODEL_REPO,
-                model_file=SMALL_MODEL_FILE,
-                model_type="llama",
-                local_files_only=True
-            )
+            try:
+                self._llm = AutoModelForCausalLM.from_pretrained(model_path_or_repo_id=f'{self._model_path}/llama-2-7b.Q5_K_M.gguf')
+            except:
+                self._llm = AutoModelForCausalLM.from_pretrained(
+                    SMALL_MODEL_REPO,
+                    model_file=SMALL_MODEL_FILE,
+                    model_type="llama"
+                )
         else:
 
             if self.verbose:
                 print(f" You have more than 10 GB of memory. {LARGE_MODEL_REPO} will be loaded.")
             try:
-                self._llm = AutoModelForCausalLM.from_pretrained(model_path_or_repo_id='models/zephyr-7b-beta.Q5_K_M.gguf')
+                self._llm = AutoModelForCausalLM.from_pretrained(model_path_or_repo_id=f'{self._model_path}/zephyr-7b-beta.Q5_K_M.gguf')
             except:
                 self._llm = AutoModelForCausalLM.from_pretrained(
                     LARGE_MODEL_REPO,

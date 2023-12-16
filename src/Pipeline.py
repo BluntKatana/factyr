@@ -33,7 +33,7 @@ class Pipeline:
         # Get answer from language model
         self.verbose_print(" ########## Question processing ##########\n")
         self.verbose_print(f" Question: {question}")
-        llm = LanguageModel(self.verbose)
+        llm = LanguageModel('models', self.verbose)
         answer = llm.get_answer(question)
         self.verbose_print(f" Answer: {answer}")
         self.verbose_print("\n #########################################\n")

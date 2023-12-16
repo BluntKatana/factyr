@@ -79,7 +79,7 @@ class AnswerExtractor:
 
         with open(f'{save_path}/qc_model_cv.pkl', 'wb') as f:
             pickle.dump(cv, f)
-        with open(f'{save_path}/data/qc_model_lr.pkl', 'wb') as f:
+        with open(f'{save_path}/qc_model_lr.pkl', 'wb') as f:
             pickle.dump(lr, f)
 
     def extract_answer(self, question, answer, entities):
