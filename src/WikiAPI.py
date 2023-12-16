@@ -1,5 +1,6 @@
 import requests
 import difflib
+from bs4 import BeautifulSoup
 
 class WikiAPI:
 
@@ -161,4 +162,30 @@ class WikiAPI:
                 except: pass
 
         return all_relations
+    
+    def get_wikipedia_table(self,url):
+        """
+        Get the infobox table from a Wikipedia page.
+
+        :param url: url of the Wikipedia page
+        """
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            # Find the table on the Wikipedia page
+            infobox_tables = soup.find_all("table", {"class": "infobox"})
+            all_infoboxes = []
+            # Extract data from the table
+            for infobox_table in infobox_tables:
+                rows = infobox_table.find_all("tr")
+                infobox_data = []
+                for row in rows:
+                    columns = row.find_all(["td", "th"])
+                    infobox_data.append([column.get_text(strip=True) for column in columns])
+
+                for info in infobox_data:
+                    all_infoboxes.append(info)
+        return all_infoboxes
 

@@ -4,10 +4,16 @@ RUN apt-get update \
     && pip install --upgrade pip
 
 RUN mkdir /src
-COPY *.py /src
+
+# Python code
+COPY src /src
+COPY main.py .
+
+# Models and data
 COPY models /src/models
 COPY data /src/data
-WORKDIR /src
+
+WORKDIR .
 COPY requirements.txt .
 
 RUN pip install -r requirements.txt

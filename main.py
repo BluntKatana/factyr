@@ -1,11 +1,11 @@
 import sys
 
-from Pipeline import Pipeline
-from LanguageModel import LanguageModel
-from EntityRecognizer_TESTING import NamedEntityRecognizer
-from AnswerExtractor import AnswerExtractor
-from FileProcessor import FileProcessor
-from FactChecker import FactChecker
+from src.Pipeline import Pipeline
+from EntityRecognizer import NamedEntityRecognizer
+from src.AnswerExtractor import AnswerExtractor
+from src.FileProcessor import FileProcessor
+from src.FactChecker import FactChecker
+from src.WikiAPI import WikiAPI
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -30,10 +30,10 @@ if __name__ == "__main__":
     file_processor = FileProcessor(input, output)
     questions = file_processor.parse_input()
 
-    # language_model = LanguageModel()
     entity_recognizer = NamedEntityRecognizer("en_core_web_sm")
     answer_extractor = AnswerExtractor()
     fact_checker = FactChecker(entity_recognizer)
+    wiki_api = WikiAPI()
     pipeline = Pipeline(entity_recognizer, answer_extractor, fact_checker)
 
     for question in questions:

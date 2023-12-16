@@ -1,4 +1,7 @@
-from LanguageModel import LanguageModel
+try:
+    from LanguageModel import LanguageModel
+except ModuleNotFoundError:
+    from src.LanguageModel import LanguageModel
 
 class Pipeline:
 

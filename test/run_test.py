@@ -2,7 +2,7 @@ import sys
 
 from Pipeline import Pipeline
 from LanguageModel import LanguageModel
-from EntityRecognizer_TESTING import NamedEntityRecognizer
+from EntityRecognizer import NamedEntityRecognizer
 from AnswerExtractor import AnswerExtractor
 
 import pandas as pd

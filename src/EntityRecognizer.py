@@ -1,6 +1,5 @@
 import spacy
 import nltk
-from WikiAPI import WikiAPI
 import difflib
 import multiprocessing as mp
 
@@ -12,11 +11,12 @@ class NamedEntityRecognizer:
         (default = "en_core_web_sm")
     """
 
-    def __init__(self, spacy_model):
+    def __init__(self, spacy_model, wiki_api):
 
         print("+ Setting up named entity recognizer/linker...")
         self._nlp = spacy.load(spacy_model)
         self._entities = []
+        self._wiki_api = wiki_api
 
     def print_entities(self, to_file: str | None = None):
         """
@@ -153,18 +153,18 @@ class NamedEntityRecognizer:
 
         return self._entities
     
-    def disambiguate_entity(self, entity_i, wikipedia_api, return_dict, return_first=False):
+    def disambiguate_entity(self, entity_i, return_dict, return_first=False):
 
         entity = self._entities[entity_i]
 
         print(f"Disambiguating entity: {entity['name']}, {entity['type']}...")
 
-        candidates = wikipedia_api.get_candidates_from_title(entity["name"], limit=15)
+        candidates = self._wiki_api.get_candidates_from_title(entity["name"], limit=15)
         entity['wikipedia_hit'] = {'title': "NO HIT", 'url': "NO HIT", 'score': 0}
 
         # Dates are very sensitive to mistakes, so we just take the first hit
         if entity['type'] == 'DATE' or return_first:
-            url, wikidata = wikipedia_api.get_wikipedia_url_from_id(candidates[0]['pageid'])
+            url, wikidata = self._wiki_api.get_wikipedia_url_from_id(candidates[0]['pageid'])
             entity['wikipedia_hit'] = {
                     'title': candidates[0]["title"],
                     'page_id': candidates[0]["pageid"],
@@ -185,7 +185,7 @@ class NamedEntityRecognizer:
 
             this_candidate_score_data = {}
 
-            wikipedia_text, url, wikidata_id = wikipedia_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
+            wikipedia_text, url, wikidata_id = self._wiki_api.get_text_url_from_pageid(candidate['title'], candidate["pageid"], candidate["title"][0].upper())
             wikipedia_text_processed = self.process_text(wikipedia_text, entity["name"])
 
             if 'may refer to' in wikipedia_text:
@@ -274,7 +274,7 @@ class NamedEntityRecognizer:
         # TODO: Find a better balance between the weight of features
         """
 
-        wikipedia_api = WikiAPI()
+        wikipedia_api = self._wiki_api
         entity_names = [entity["name"] for entity in self._entities]
 
         entity_data = {}
@@ -285,9 +285,9 @@ class NamedEntityRecognizer:
         pool = mp.Pool(mp.cpu_count())
 
         for i in range(len(self._entities)):
-            pool.apply_async(self.disambiguate_entity, args=(i, wikipedia_api, return_data, return_first))
+            pool.apply_async(self.disambiguate_entity, args=(i, return_data, return_first))
 
-            # p = mp.Process(target=self.disambiguate_entity, args=(i, wikipedia_api, return_data))
+            # p = mp.Process(target=self.disambiguate_entity, args=(i, self._wiki_api, return_data))
             # processes.append(p)
             # p.start()
         pool.close()

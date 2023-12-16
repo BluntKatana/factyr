@@ -6,3 +6,6 @@ pandas
 scikit-learn
 torch
 psutil
+stanfordnlp
+bs4
+requests
