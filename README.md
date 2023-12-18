@@ -28,11 +28,11 @@ docker run -it larooij/factyr
 
 To use an input file, you can copy the file to the Docker container by running:
 ```
-docker cp <input_file> <container_id>:/app/example.txt
+docker cp <input_file> <container_id>:/factyr-app/example.txt
 ```
 However, we recommend running the program with an input file by mounting the directory containing the input file to the Docker container. This way, you can easily access the output file. To do this, run:
 ```
-docker run -it -v <local_input_file_directory>:/app/inputs larooij/factyr
+docker run -it -v <local_input_file_directory>:/factyr-app/inputs larooij/factyr
 ```
 The inputs are now available in the `inputs` directory in the Docker container.
 

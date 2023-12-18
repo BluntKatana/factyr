@@ -14,6 +14,9 @@ COPY main.py .
 COPY models models
 COPY data data
 
+# Add simple example
+COPY test/example_input.txt test/example_input.txt
+
 COPY requirements.txt .
 
 # Dependencies
