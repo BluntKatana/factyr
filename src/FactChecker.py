@@ -34,6 +34,7 @@ class FactChecker:
 
         # Try 1: Use Wikidata to check if the relation exists
         rels = self.extract_relations_to_check(question, answer)
+
         check = self.check_with_wikidata(rels)
         if answer['type'] == YES_NO_QUESTION:
             if check == answer['A'] and answer['A'] == 'yes':
@@ -60,7 +61,7 @@ class FactChecker:
             if check == 'yes':
                 return 'correct'
 
-        return 'incorrect' if check == 'yes' else 'correct'
+        return 'correct' if answer['A'] == 'no' else 'incorrect'
 
     def relations_from_question(self, question, entities):
         """
@@ -85,9 +86,19 @@ class FactChecker:
             if relation['subject'] in entity_names:
                 new_relation['subject'] = [entity for entity in entities if entity['name'] == relation['subject']][0]
                 new_relation['nr_entities'] += 1
+            else:
+                new_entity = self._entity_recognizer.find_entity_wikipedia_hit(relation['subject'])
+                if new_entity:
+                    new_relation['subject'] = new_entity
+                    new_relation['nr_entities'] += 1
             if relation['object'] in entity_names:
                 new_relation['object'] = [entity for entity in entities if entity['name'] == relation['object']][0]
                 new_relation['nr_entities'] += 1
+            else:
+                new_entity = self._entity_recognizer.find_entity_wikipedia_hit(relation['object'])
+                if new_entity:
+                    new_relation['object'] = new_entity
+                    new_relation['nr_entities'] += 1
 
             # Remove stopwords
             new_relation['relation'] = " ".join([str(word) for word in self._nlp(relation['relation']) if not word.is_stop])
@@ -195,6 +206,9 @@ class FactChecker:
                         'subject': entity['name']
                     }
 
+                if not entity:
+                    continue
+
                 # Get relations from Wikipedia with entity as subject or object
                 wikipedia_relations = self.get_relations_wikipedia(
                     [entity['wikipedia_hit']['page_id']],
@@ -204,7 +218,7 @@ class FactChecker:
 
                 # Create similarity score for each relation, if above 0.5, approve
                 for wikirel in wikipedia_relations:
-                    
+
                     if self.relation_similarity(cleaned_relation, wikirel) >= 0.5:
                         return 'yes'
 

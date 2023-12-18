@@ -29,6 +29,11 @@ class NamedEntityRecognizer:
             if 'wikipedia_hit' in entity:
                 print(f" Entity Wikipedia hit: {entity['wikipedia_hit']['url']}")
 
+    def get_entities(self, text):
+
+        self.extract_entities(text)
+        return self.disambiguate_entities()
+
     def process_text(self, text: str, current_entity: str = "", stemmed=True) -> list:
         """
         Processes a text to be able to compare it with other texts.
@@ -154,6 +159,24 @@ class NamedEntityRecognizer:
 
         return self._entities
     
+    def find_entity_wikipedia_hit(self, entity_name):
+
+        try:
+            candidates = self._wiki_api.get_candidates_from_title(entity_name, limit=1)
+            url, wikidata = self._wiki_api.get_wikipedia_url_from_id(candidates[0]['pageid'])
+            return {
+                'name': entity_name,
+                'wikipedia_hit': {
+                    'title': candidates[0]["title"],
+                    'page_id': candidates[0]["pageid"],
+                    'url': url,
+                    'wikidata_id': wikidata,
+                    'score': 1
+                }
+            }
+        except:
+            return {}
+    
     def disambiguate_entity(self, entity_i, return_dict, return_first=False):
 
         entity = self._entities[entity_i]
@@ -176,80 +199,84 @@ class NamedEntityRecognizer:
             return
 
         for i, candidate in enumerate(candidates):
+                
+            try:
+                if 'disambiguation' in candidate['title'].lower() or 'list of' in candidate['title'].lower():
+                    continue
 
-            if 'disambiguation' in candidate['title'].lower() or 'list of' in candidate['title'].lower():
-                continue
+                this_candidate_score_data = {}
 
-            this_candidate_score_data = {}
+                wikipedia_text, url, wikidata_id = self._wiki_api.get_text_url_from_pageid(candidate["pageid"])
+                wikipedia_text_processed = self.process_text(wikipedia_text, entity["name"])
 
-            wikipedia_text, url, wikidata_id = self._wiki_api.get_text_url_from_pageid(candidate["pageid"])
-            wikipedia_text_processed = self.process_text(wikipedia_text, entity["name"])
+                if 'may refer to' in wikipedia_text:
+                    continue
 
-            if 'may refer to' in wikipedia_text:
-                continue
+                # Initialize the similarity value - used to check the similarity between an entity and candidate
+                similarity = 0
 
-            # Initialize the similarity value - used to check the similarity between an entity and candidate
-            similarity = 0
+                # Similarity between context words in text and context words in Wikipedia article title and article
+                # similarity += self.jaccard_similarity(context_words, wikipedia_text_processed)
+                # this_candidate_score_data['text_similarity'] = self.jaccard_similarity(context_words, wikipedia_text_processed)
+                # similarity += self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
+                # this_candidate_score_data['title_similarity'] = self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
 
-            # Similarity between context words in text and context words in Wikipedia article title and article
-            # similarity += self.jaccard_similarity(context_words, wikipedia_text_processed)
-            # this_candidate_score_data['text_similarity'] = self.jaccard_similarity(context_words, wikipedia_text_processed)
-            # similarity += self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
-            # this_candidate_score_data['title_similarity'] = self.jaccard_similarity(context_words, wikipedia_title_text_processed) * boost_title_similarity
-
-            # Boost if there is a full hit (entity name === canadidate title)
-            # if self.is_full_hit(entity["name"], candidate["title"]):
-            #     similarity += boost_full_hit
-            #     this_candidate_score_data['full_hit'] = boost_full_hit
+                # Boost if there is a full hit (entity name === canadidate title)
+                # if self.is_full_hit(entity["name"], candidate["title"]):
+                #     similarity += boost_full_hit
+                #     this_candidate_score_data['full_hit'] = boost_full_hit
 
 
-            # Punish if the found candidate is also an entity in the text
-            # if candidate["title"] in entity_names and candidate["title"] != entity["name"]:
-            #     similarity -= deboost_other_entity
-            #     this_candidate_score_data['other_entity'] = -deboost_other_entity
+                # Punish if the found candidate is also an entity in the text
+                # if candidate["title"] in entity_names and candidate["title"] != entity["name"]:
+                #     similarity -= deboost_other_entity
+                #     this_candidate_score_data['other_entity'] = -deboost_other_entity
 
-            # Boost first hit
-            # if i == 0:
-            #     similarity += boost_first_hit
-            #     this_candidate_score_data['first_hit'] = boost_first_hit
+                # Boost first hit
+                # if i == 0:
+                #     similarity += boost_first_hit
+                #     this_candidate_score_data['first_hit'] = boost_first_hit
 
-            # Add similarity of context words in text and context words in Wikipedia article introtext
-            # based on the weight of context weights
-            context_score = 0
-            nr_of_found_context_words = 0
-            for context_word in entity["context"]:
-                if context_word["word"] in wikipedia_text_processed:
-                    context_score += context_word["weight"]
-                    # similarity += context_word["weight"]
-                    nr_of_found_context_words += 1
+                # Add similarity of context words in text and context words in Wikipedia article introtext
+                # based on the weight of context weights
+                context_score = 0
+                nr_of_found_context_words = 0
+                for context_word in entity["context"]:
+                    if context_word["word"] in wikipedia_text_processed:
+                        context_score += context_word["weight"]
+                        # similarity += context_word["weight"]
+                        nr_of_found_context_words += 1
 
-            this_candidate_score_data['context_score'] = context_score
+                this_candidate_score_data['context_score'] = context_score
 
-            # Boost if entity is same category as first entity hit in Wikipedia article
-            # if entity['type'] != 'PERSON':
-            #     text_nlp = self._nlp(wikipedia_text)
-            #     if text_nlp.ents:
-            #         if text_nlp.ents[0].label_ == entity['type']:
-            #             similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
-            #             this_candidate_score_data['same_category'] = boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
+                # Boost if entity is same category as first entity hit in Wikipedia article
+                # if entity['type'] != 'PERSON':
+                #     text_nlp = self._nlp(wikipedia_text)
+                #     if text_nlp.ents:
+                #         if text_nlp.ents[0].label_ == entity['type']:
+                #             similarity += boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
+                #             this_candidate_score_data['same_category'] = boost_same_category if candidate['title'] == text_nlp.ents[0].text else boost_same_category / 2
 
-            position_boost = 1/(i+1)
+                position_boost = 1/(i+1)
 
-            name_title_ratio = difflib.SequenceMatcher(None, entity["name"], candidate["title"]).ratio()
-            nice_score = (name_title_ratio + position_boost) * ((nr_of_found_context_words / len(entity["context"])) + context_score + 0.1)
-            similarity += nice_score
-            # print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]), nice_score)
-            # Update entity with best candidate
-            # print(f"Candidate: {candidate['title']}, score: {similarity}")
-            if similarity > entity['wikipedia_hit']['score']:
-                entity['wikipedia_hit'] = {
-                    'title': candidate["title"],
-                    'url': url,
-                    'page_id': candidate["pageid"],
-                    'score': similarity,
-                    'wikidata_id': wikidata_id
-                }
+                name_title_ratio = difflib.SequenceMatcher(None, entity["name"], candidate["title"]).ratio()
+                nice_score = (name_title_ratio + position_boost) * ((nr_of_found_context_words / len(entity["context"])) + context_score + 0.1)
+                similarity += nice_score
+                # print(candidate["title"], similarity, nr_of_found_context_words / len(entity["context"]), nice_score)
+                # Update entity with best candidate
+                # print(f"Candidate: {candidate['title']}, score: {similarity}")
+                if similarity > entity['wikipedia_hit']['score']:
+                    entity['wikipedia_hit'] = {
+                        'title': candidate["title"],
+                        'url': url,
+                        'page_id': candidate["pageid"],
+                        'score': similarity,
+                        'wikidata_id': wikidata_id
+                    }
 
+            except:
+                pass
+        
         return_dict[entity_i] = entity
 
     def disambiguate_entities(self, return_first=False):

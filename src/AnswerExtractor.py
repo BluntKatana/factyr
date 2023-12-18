@@ -16,9 +16,10 @@ ENTITY_QUESTION = 2
 
 class AnswerExtractor:
 
-    def __init__(self, model_path, data_path):
+    def __init__(self, model_path, data_path, entity_extractor):
         self._model_path = model_path
         self._data_path = data_path
+        self._entity_extractor = entity_extractor
         self.load_models()
 
     def load_models(self):
@@ -169,7 +170,10 @@ class AnswerExtractor:
         }
         extracted_answer = self._entity_extractor(QA_input)
 
-        similarities = [(entity, difflib.SequenceMatcher(None, entity['name'], extracted_answer['answer']).ratio()) for entity in entities]
-        most_similar = max(similarities, key=lambda x: x[1])[0]
+        entity = self._entity_extractor.find_entity_wikipedia_hit(extracted_answer['answer'])
 
-        return {'A': most_similar, 'type': ENTITY_QUESTION}, most_similar['name']
+        if not entity:
+            similarities = [(entity, difflib.SequenceMatcher(None, entity['name'], extracted_answer['answer']).ratio()) for entity in entities]
+            entity = max(similarities, key=lambda x: x[1])[0]
+
+        return {'A': entity, 'type': ENTITY_QUESTION}, entity['name']

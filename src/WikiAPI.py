@@ -124,7 +124,11 @@ class WikiAPI:
             }}
         """.format(id_1=wikidata_id_1, id_2=wikidata_id_2)
         r = requests.get(self._sparql_url, params={'format': 'json', 'query': query_1})
-        data = r.json()
+
+        try:
+            data = r.json()
+        except:
+            return []
 
         all_relations = []
         for res in data['results']['bindings']:
@@ -154,7 +158,12 @@ class WikiAPI:
                 """.format(rel_id=rel_id)
             r = requests.get(self._sparql_url, params={'format': 'json', 'query': query_3})
 
-            for result in r.json()['results']['bindings']:
+            try:
+                data = r.json()['results']['bindings']
+            except:
+                continue
+
+            for result in data:
                 try:
                     splitted_list = result['altLabel_list']['value'].split(',')
                     for item in splitted_list:
