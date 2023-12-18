@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     wiki_api = WikiAPI()
     entity_recognizer = NamedEntityRecognizer("en_core_web_sm", wiki_api)
-    answer_extractor = AnswerExtractor('models', 'data')
+    answer_extractor = AnswerExtractor('models', 'data', entity_recognizer)
     fact_checker = FactChecker(entity_recognizer, wiki_api)
     pipeline = Pipeline(entity_recognizer, answer_extractor, fact_checker, verbose=args.verbose)
 

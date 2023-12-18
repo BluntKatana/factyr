@@ -97,6 +97,58 @@ def annotate_test(input_f, output_f):
 
         json.dump(output_data, open(output_f, 'w'), indent=4)
 
+def evaluate(input_f):
+
+    data = json.load(open(input_f, 'r'))
+
+    correct_entities = 0
+    total_entities = 0
+
+    correct_answers = 0
+    correct_fact_checks = 0
+    correct_correct_fact_checks = 0
+    total_correct = 0
+    correct_incorrect_fact_checks = 0
+    total_incorrect = 0
+    recognition_mistakes = 26
+
+    for q_id, q_data in data.items():
+
+        if q_data['ExtractedAnswerCorrect'] == 'yes':
+            correct_answers += 1
+
+        if q_data['REALFactCheck'] == q_data['FactCheck']:
+            correct_fact_checks += 1
+
+            if q_data['REALFactCheck'] == 'correct':
+                correct_correct_fact_checks += 1
+
+            if q_data['REALFactCheck'] == 'incorrect':
+                correct_incorrect_fact_checks += 1
+
+        if q_data['REALFactCheck'] == 'correct':
+            total_correct += 1
+        if q_data['REALFactCheck'] == 'incorrect':
+            total_incorrect += 1
+
+        for entity in q_data['Entities']:
+            total_entities += 1
+            if entity['CorrectURL'] == 'yes':
+                correct_entities += 1
+            # else:
+            #     test = input(f"Is {entity['name']} {entity['wikipedia_hit']['url']} a recognition mistake?")
+            #     if test == 'y':
+            #         recognition_mistakes += 1
+
+    wrong_entities = total_entities - correct_entities
+    print(f"Correct entities: {correct_entities}/{total_entities} ({correct_entities / total_entities * 100:.2f}%)")
+    print(f"From which recognition mistakes: {recognition_mistakes}/{wrong_entities} ({recognition_mistakes / wrong_entities * 100:.2f}%)")
+    print(f"Correct answers: {correct_answers}/{len(data)} ({correct_answers / len(data) * 100:.2f}%)")
+    print(f"Correct fact checks: {correct_fact_checks}/{len(data)} ({correct_fact_checks / len(data) * 100:.2f}%)")
+    print(f"Correctly predicted 'correct': {correct_correct_fact_checks}/{total_correct} ({correct_correct_fact_checks / total_correct * 100:.2f}%)")
+    print(f"Correctly predicted 'incorrect': {correct_incorrect_fact_checks}/{total_incorrect} ({correct_incorrect_fact_checks / total_incorrect * 100:.2f}%)")
+
+
 
 if __name__ == "__main__":
 
@@ -112,4 +164,4 @@ if __name__ == "__main__":
         print("Please provide an output file.")
         sys.exit()
 
-    annotate_test(input_f, output)
+    evaluate(input_f)
