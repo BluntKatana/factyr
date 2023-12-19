@@ -2,7 +2,7 @@ import sys
 
 from src.LanguageModel import LanguageModel
 from src.EntityRecognizer import NamedEntityRecognizer
-from src.AnswerExtractor import AnswerExtractor, ENTITY_QUESTION
+from src.AnswerExtractor import AnswerExtractor, ENTITY_QUESTION, YES_NO_QUESTION
 from src.FactChecker import FactChecker
 from src.WikiAPI import WikiAPI
 
@@ -16,13 +16,15 @@ def run_test(input, output):
 
     wiki_api = WikiAPI()
     entity_recognizer = NamedEntityRecognizer("en_core_web_sm", wiki_api)
-    answer_extractor = AnswerExtractor('models', 'data')
+    answer_extractor = AnswerExtractor('models', 'data', entity_recognizer)
     fact_checker = FactChecker(entity_recognizer, wiki_api)
 
     questions = pd.read_csv(input)
     all_data = []
 
     for index, question in questions.iterrows():
+
+        question_id = f'question_{(index+1)}'
 
         print(f"Question {index + 1} of {len(questions)}")
 
@@ -31,7 +33,7 @@ def run_test(input, output):
         except FileNotFoundError:
             all_output = {}
 
-        if question['QuestionID'] in all_output:
+        if question_id in all_output:
             continue
 
         entities = entity_recognizer.get_entities(question["LLM_Answer"])
@@ -42,20 +44,31 @@ def run_test(input, output):
         fact_checker_answer = fact_checker.check(question["Question"], answer)
 
 
-        all_output[question['QuestionID']] = {
-            "QuestionID": question["QuestionID"],
+        # all_output[question['QuestionID']] = {
+        #     "QuestionID": question_id,
+        #     "Question": question["Question"],
+        #     "RawAnswer": question["LLM_Answer"],
+        #     "ExtractedAnswer": answer,
+        #     "Entities": entities,
+        #     "FactCheck": fact_checker_answer,
+        #     "REALAnswer": {
+        #         'title': question['Answer'],
+        #         'url': question['Wikipedia_URL']
+        #     },
+        #     "REALQuestionType": ENTITY_QUESTION
+        # }
+
+        all_output[question_id] = {
+            "QuestionID": question_id,
             "Question": question["Question"],
             "RawAnswer": question["LLM_Answer"],
             "ExtractedAnswer": answer,
             "Entities": entities,
             "FactCheck": fact_checker_answer,
-            "REALAnswer": {
-                'title': question['Answer'],
-                'url': question['Wikipedia_URL']
-            },
-            "REALQuestionType": ENTITY_QUESTION
+            "REALAnswer": question['REALAnswer'],
+            "REALFactCheck" : question['REALFactCheck'],
+            "REALQuestionType": YES_NO_QUESTION
         }
-
 
         print("---------")
 
@@ -77,21 +90,14 @@ def annotate_test(input_f, output_f):
 
         print(f"Question: {q_data['Question']}")
         print(f"Answer: {q_data['RawAnswer']}")
-        print(f"Real answer: {q_data['REALAnswer']['url']}")
 
-        question_string = f"Is {q_data['ExtractedAnswer']['A']['name']} correctly extracted?"
+        q_data['ExtractedAnswerCorrect'] = 'yes' if  q_data['ExtractedAnswer']['A'] == q_data['REALAnswer'] else 'no'
 
-        test = input(question_string)
-        q_data['ExtractedAnswerCorrect'] = 'yes' if test == 'y' else 'no'
+        # for entity in q_data['Entities']:
 
-        test = input(f"Is {q_data['ExtractedAnswer']['A']['wikipedia_hit']['url']} the correct answer?")
-        q_data['REALFactCheck'] = 'correct' if test == 'y' else 'incorrect'
-
-        for entity in q_data['Entities']:
-
-            print(f"Entity: {entity['name']}")
-            test = input(f"Is {entity['wikipedia_hit']['url']} the correct entity?")
-            entity['CorrectURL'] = 'yes' if test == 'y' else 'no'
+        #     print(f"Entity: {entity['name']}")
+        #     test = input(f"Is {entity['wikipedia_hit']['url']} the correct entity?")
+        #     entity['CorrectURL'] = 'yes' if test == 'y' else 'no'
 
         output_data[q_id] = q_data
 
@@ -104,15 +110,20 @@ def evaluate(input_f):
     correct_entities = 0
     total_entities = 0
 
+    correct_answer_types = 0
+
     correct_answers = 0
     correct_fact_checks = 0
     correct_correct_fact_checks = 0
     total_correct = 0
     correct_incorrect_fact_checks = 0
     total_incorrect = 0
-    recognition_mistakes = 26
+    recognition_mistakes = 0
 
     for q_id, q_data in data.items():
+
+        if q_data['REALQuestionType'] == q_data['ExtractedAnswer']['type']:
+            correct_answer_types += 1
 
         if q_data['ExtractedAnswerCorrect'] == 'yes':
             correct_answers += 1
@@ -135,14 +146,15 @@ def evaluate(input_f):
             total_entities += 1
             if entity['CorrectURL'] == 'yes':
                 correct_entities += 1
-            # else:
-            #     test = input(f"Is {entity['name']} {entity['wikipedia_hit']['url']} a recognition mistake?")
-            #     if test == 'y':
-            #         recognition_mistakes += 1
+            else:
+                test = input(f"Is {entity['name']} {entity['wikipedia_hit']['url']} a recognition mistake?")
+                if test == 'y':
+                    recognition_mistakes += 1
 
     wrong_entities = total_entities - correct_entities
     print(f"Correct entities: {correct_entities}/{total_entities} ({correct_entities / total_entities * 100:.2f}%)")
     print(f"From which recognition mistakes: {recognition_mistakes}/{wrong_entities} ({recognition_mistakes / wrong_entities * 100:.2f}%)")
+    print(f"Correct answer types: {correct_answer_types}/{len(data)} ({correct_answer_types / len(data) * 100:.2f}%)")
     print(f"Correct answers: {correct_answers}/{len(data)} ({correct_answers / len(data) * 100:.2f}%)")
     print(f"Correct fact checks: {correct_fact_checks}/{len(data)} ({correct_fact_checks / len(data) * 100:.2f}%)")
     print(f"Correctly predicted 'correct': {correct_correct_fact_checks}/{total_correct} ({correct_correct_fact_checks / total_correct * 100:.2f}%)")
