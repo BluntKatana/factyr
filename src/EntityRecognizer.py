@@ -210,7 +210,7 @@ class NamedEntityRecognizer:
 
         # Dates are very sensitive to mistakes, so we just take the first hit
         if entity['type'] == 'DATE' or return_first:
-            entity['wikipedia_hit'] = self.find_entity_wikipedia_hit(entity['name'])
+            entity['wikipedia_hit'] = self.find_entity_wikipedia_hit(entity['name'])['wikipedia_hit']
             return_dict[entity_i] = entity
             return
 

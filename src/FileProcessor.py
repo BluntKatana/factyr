@@ -75,4 +75,4 @@ class FileProcessor:
 
             # Entities
             for entity in entities:
-                file.write(f'{question_id}\tE"{entity["name"]}"\t{entity["wikipedia_hit"]["url"]}\n')
+                file.write(f'{question_id}\tE"{entity["name"]}"\t"{entity["wikipedia_hit"]["url"]}"\n')
