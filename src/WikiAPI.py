@@ -1,16 +1,25 @@
+# ------------------------------------------------------ #
+#
+# WikiAPI.py contains the WikiAPI class. It is used to
+# retrieve information from Wikipedia and Wikidata.
+#
+# Group 19: Pooja, Kshitij, Floris, Maik
+#
+# ------------------------------------------------------ #
+
 import requests
-import difflib
 from bs4 import BeautifulSoup
 
+
 class WikiAPI:
+    """
+    Endpoint to retrieve information from Wikipedia and Wikidata.
+    """
 
     def __init__(self):
         self._session = requests.Session()
         self._url = "https://en.wikipedia.org/w/api.php"
         self._sparql_url = "https://query.wikidata.org/sparql"
-
-        self._cache = {}
-
 
     def get_candidates_from_title(self, title: str, limit: int = 15):
         """
@@ -78,28 +87,6 @@ class WikiAPI:
         text = data[list(data.keys())[0]]["extract"]
         url = data[list(data.keys())[0]]["fullurl"]
         wikidata_id = data[list(data.keys())[0]]["pageprops"]["wikibase_item"]
-
-        # print(f"Loading Wikipedia file for {first_char}...")
-
-        # try:
-        #     text_dict = self._cache[first_char]
-        # except KeyError:
-
-        #     try:
-        #         with open(f"wikidata/{first_char}.json", "r") as f:
-        #             text_dict = ujson.load(f)
-        #             self._cache[first_char] = text_dict
-        #     except FileNotFoundError:
-        #         print(f"Failed to load Wikipedia file for {first_char}.")
-        #         text_dict = {}
-
-        # try:
-        #     text = text_dict[str(page_id)]
-        #     print(text[:10])
-        # except KeyError:
-        #     text = ""
-        #     print(f"Failed to load Wikipedia text for {page_id}.")
-        # url = f"https://en.wikipedia.org/wiki?curid={page_id}"
 
         return text, url, wikidata_id
     
@@ -197,4 +184,3 @@ class WikiAPI:
                 for info in infobox_data:
                     all_infoboxes.append(info)
         return all_infoboxes
-

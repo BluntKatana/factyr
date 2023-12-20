@@ -1,13 +1,23 @@
-import spacy
+# ------------------------------------------------------ #
+#
+# FactChecker class to check if the extracted answer is correct.
+# Uses Wikidata, Wikipedia infoboxes and Wikipedia text.
+#
+# Group 19: Pooja, Kshitij, Floris, Maik
+#
+# ------------------------------------------------------ #
+
 import difflib
 import re
 
+import spacy
+
 try:
+    from src.AnswerExtractor import ENTITY_QUESTION, YES_NO_QUESTION
     from src.utils.openie import StanfordOpenIE
-    from src.AnswerExtractor import YES_NO_QUESTION, ENTITY_QUESTION
 except ModuleNotFoundError:
+    from AnswerExtractor import ENTITY_QUESTION, YES_NO_QUESTION
     from utils.openie import StanfordOpenIE
-    from AnswerExtractor import YES_NO_QUESTION, ENTITY_QUESTION
 
 class FactChecker:
     """
@@ -73,6 +83,7 @@ class FactChecker:
         :param entities: entities extracted from the question
         """
 
+        # Extract relations from question
         relations = self._open_ie.annotate(question)
         entity_names = [entity['name'] for entity in entities]
 
@@ -82,25 +93,18 @@ class FactChecker:
             new_relation = relation
             new_relation['nr_entities'] = 0
 
-            # Replace with entities
-            if relation['subject'] in entity_names:
-                new_relation['subject'] = [entity for entity in entities if entity['name'] == relation['subject']][0]
-                new_relation['nr_entities'] += 1
-            else:
-                new_entity = self._entity_recognizer.find_entity_wikipedia_hit(relation['subject'])
-                if new_entity:
-                    new_relation['subject'] = new_entity
+            # Replace object and subject with entity if possible
+            for part in ['subject', 'object']:
+                if relation[part] in entity_names:
+                    new_relation[part] = [entity for entity in entities if entity['name'] == relation[part]][0]
                     new_relation['nr_entities'] += 1
-            if relation['object'] in entity_names:
-                new_relation['object'] = [entity for entity in entities if entity['name'] == relation['object']][0]
-                new_relation['nr_entities'] += 1
-            else:
-                new_entity = self._entity_recognizer.find_entity_wikipedia_hit(relation['object'])
-                if new_entity:
-                    new_relation['object'] = new_entity
-                    new_relation['nr_entities'] += 1
+                else:
+                    new_entity = self._entity_recognizer.find_entity_wikipedia_hit(relation[part])
+                    if new_entity:
+                        new_relation[part] = new_entity
+                        new_relation['nr_entities'] += 1
 
-            # Remove stopwords
+            # Remove stopwords from relation
             new_relation['relation'] = " ".join([str(word) for word in self._nlp(relation['relation']) if not word.is_stop])
 
             if new_relation['relation']:
@@ -125,7 +129,7 @@ class FactChecker:
 
             return self.relations_from_question(question, entities)
 
-        else:
+        elif answer['type'] == ENTITY_QUESTION:
  
             # Replace PRON with entity
             nlp = spacy.load("en_core_web_sm")
@@ -150,6 +154,8 @@ class FactChecker:
         """
 
         for relation in relations:
+            
+            # ONLY works for relations with 2 entities
             if relation['nr_entities'] == 2:
 
                 wikidata_relations = self._wiki_api.get_relations_wikidata(
@@ -345,4 +351,3 @@ class FactChecker:
                                 return 'yes'
         # No proof found
         return 'no'
-

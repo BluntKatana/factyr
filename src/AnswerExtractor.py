@@ -1,13 +1,25 @@
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, AutoModelForQuestionAnswering, pipeline
-import spacy
+# ------------------------------------------------------ #
+#
+# AnswerExtractor.py is a class that is used to extract
+# answers from a given question and answer.
+#
+# Group 19: Pooja, Kshitij, Floris, Maik
+#
+# ------------------------------------------------------ #
+
+import difflib
+import os
+import pickle
+import re
+
 import pandas as pd
+import spacy
+import torch
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
-import re
-import pickle
-import os
-import difflib
+from transformers import (AutoModelForQuestionAnswering,
+                          AutoModelForSequenceClassification, AutoTokenizer,
+                          pipeline)
 
 # Constants
 YES_NO_QUESTION = 1
@@ -15,6 +27,16 @@ ENTITY_QUESTION = 2
 
 
 class AnswerExtractor:
+    """
+    Can extract answers from a given question and answer.
+    - Uses a question classifier to determine the type of the question.
+    - Uses a pre-trained model to answer yes/no questions.
+    - Uses a pre-trained model to answer entity questions.
+
+    :param model_path: path to the folder where the models are stored
+    :param data_path: path to the folder where the training data is stored
+    :param entity_recognizer: entity recognizer to find entities in the answer
+    """
 
     def __init__(self, model_path, data_path, entity_recognizer):
         self._model_path = model_path
@@ -23,11 +45,13 @@ class AnswerExtractor:
         self.load_models()
 
     def load_models(self):
+        """
+        Loads all the models that are used for answer extraction.
+        """
 
         print("+ Loading models for answer extraction...")
 
         print("++ Loading question classifier...")
-        # Load trained models
         if not os.path.exists(f'{self._model_path}/qc_model_cv.pkl') or not os.path.exists(f'{self._model_path}/qc_model_lr.pkl'):
             self.train_question_classifier(f"{self._data_path}/qc_train.csv", self._model_path)
         self._q_cv = pickle.load(open(f'{self._model_path}/qc_model_cv.pkl', 'rb'))
@@ -68,16 +92,18 @@ class AnswerExtractor:
 
         print("+++ Training question classifier...")
 
+        # Preprocess data
         data = pd.read_csv(train_data).dropna()
         data['text_proc'] = data['text'].map(process)
 
+        # Train model
         cv = CountVectorizer()
         X_train_cv = cv.fit_transform(data['text_proc'])
         y_train = data['type']
-
         lr = LogisticRegression(max_iter=1000)
         lr.fit(X_train_cv, y_train)
 
+        # Save models for future use
         with open(f'{save_path}/qc_model_cv.pkl', 'wb') as f:
             pickle.dump(cv, f)
         with open(f'{save_path}/qc_model_lr.pkl', 'wb') as f:
@@ -91,29 +117,14 @@ class AnswerExtractor:
         :param answer: answer to the question
         """
 
+        # Determine question type
         question_type = self.classify_question(question)
 
+        # Answer question based on type
         if question_type == YES_NO_QUESTION:
             return self.answer_yes_no_question(question, answer)
         else:
             return self.answer_entity_question(question, answer, entities)
-
-    def get_question_type(self, question, answer):
-        """
-        Determines the type of the question.
-        Very simple base: check if the first word in the question is a Wh-word.
-        https://www.lawlessenglish.com/learn-english/grammar/questions-wh/
-
-        :param question: question to be checked
-        :param answer: answer to the question
-        """
-
-        Wh_words = ["who", "whom", "what", "where", "when",
-                    "why", "how", "which", "whose"]
-        if question.lower().split()[0] in Wh_words:
-            return ENTITY_QUESTION
-
-        return YES_NO_QUESTION
 
     def classify_question(self, question):
         """
@@ -138,19 +149,19 @@ class AnswerExtractor:
     def answer_yes_no_question(self, question, answer):
         """
         Answers a yes/no question. Uses a pre-trained model based on
-        'boolq' dataset: 
+        'boolq' dataset: https://www.kaggle.com/datasets/boolq
 
         :param question: question to be answered
         :param answer: answer to the question
         """
 
-        sequence = self._yes_no_tokenizer.encode_plus(question, answer, 
+        sequence = self._yes_no_tokenizer.encode_plus(question, answer,
                                                       return_tensors="pt")['input_ids'].to('cpu')
 
+        # Predict answer based on probabilities
         with torch.no_grad():
             logits = self._yes_nomodel(sequence)[0]
             probabilities = torch.softmax(logits, dim=1).detach().cpu().tolist()[0]
-
         yn_answer = 'yes' if probabilities[0] < probabilities[1] else 'no'
 
         return {'A': yn_answer, 'type': YES_NO_QUESTION}, yn_answer
@@ -164,18 +175,19 @@ class AnswerExtractor:
         :param entities: list of entities in the answer
         """
 
+        # Extract answer to question from answer text
         QA_input = {
             'question': question,
             'context': answer
         }
         extracted_answer = self._entity_extractor(QA_input)
 
+        # Connect answer to entity + wikipedia hit
         entity = self._entity_recognizer.find_entity_wikipedia_hit(extracted_answer['answer'])
-
-        print(f"Extracted answer: {extracted_answer['answer']}")
-
         if not entity:
-            similarities = [(entity, difflib.SequenceMatcher(None, entity['name'], extracted_answer['answer']).ratio()) for entity in entities]
+            similarities = [(entity, difflib.SequenceMatcher(None, entity['name'],
+                                                             extracted_answer['answer']).ratio())
+                            for entity in entities]
             entity = max(similarities, key=lambda x: x[1])[0]
 
         return {'A': entity, 'type': ENTITY_QUESTION}, entity['name']

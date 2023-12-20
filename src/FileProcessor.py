@@ -1,7 +1,22 @@
+# ------------------------------------------------------ #
+#
+# FileProcessor.py handles parsing input file and writing
+# to the output file according to the required format.
+#
+# Group 19: Pooja, Kshitij, Floris, Maik
+#
+# ------------------------------------------------------ #
+
 import re
 
 
 class FileProcessor:
+    """
+    Handles parsing input file and writing output file.
+
+    :param in_path: path to input file
+    :param out_path: path to output file
+    """
 
     def __init__(self, in_path, out_path):
         self.in_path = in_path

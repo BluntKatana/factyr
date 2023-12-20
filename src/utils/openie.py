@@ -1,11 +1,11 @@
-#------------------------------------------------------#
+# ------------------------------------------------------ #
 #
-#   openie.py is a wrapper for Stanford OpenIE.
-#   Not written by us, but used in our project.
-#   It is used to extract triples from a sentence.
-#   src: https://github.com/philipperemy/stanford-openie-python/blob/master/openie/openie.py
+# openie.py is a wrapper for Stanford OpenIE.
+# Not written by us, but used in our project.
+# It is used to extract triples from a sentence.
+# src: https://github.com/philipperemy/stanford-openie-python/blob/master/openie/openie.py
 #
-#------------------------------------------------------#        
+# ------------------------------------------------------ #
 
 
 import os
