@@ -11,6 +11,14 @@ Practical assignment for the course: Web Data Processing Systems.
 
 Team (19): Floris Bos, Pooja Mangal, Kshitij Kavimandan and Maik Larooij
 
+## Introduction
+
+factyr is a fact checking pipeline for the [Zephyr](https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF) 7B language model. It takes a text file with questions as input (see [example](test/example_input.txt)) and writes the output in a specific format (see [example](test/example_output.txt)). The pipeline consists of four modules:
+- **Language model**: a large language model that generates text based on a given input
+- **Entity extraction**: a module that extracts entities from a given text and links them to Wikipedia pages
+- **Answer extraction**: a module that extracts a clear answer from the text (e.g. yes/no or a Wikipedia entity)
+- **Fact checking**: a module that checks whether the answer is correct using existing knowledge bases
+
 ## Usage
 
 ### Installation with Docker (**RECOMMENDED**)
