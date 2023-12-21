@@ -18,6 +18,7 @@ COPY data data
 COPY test/example_input.txt test/example_input.txt
 
 COPY requirements.txt .
+COPY README.md .
 
 # Dependencies
 RUN pip install -r requirements.txt
